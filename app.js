@@ -37,7 +37,7 @@ const I18N = {
     "welcome.p": "Agenda del lavado: clientes, vehículos, precios, citas y aviso de la última limpieza. Todo queda en este móvil.",
     "welcome.empty": "Empezar con mi taller",
     "welcome.demo": "Ver un día de ejemplo",
-    "hoje.washes": "lavados hoy",
+    "hoje.washes": "lavados de hoy",
     "hoje.paid": "cobrado hoy",
     "hoje.remind": "para avisar",
     "hoje.due": "por cobrar",
@@ -88,10 +88,43 @@ const I18N = {
     "cash.nopend": "Nada pendiente este mes.",
     "cash.got": "Cobrado",
     "cash.nogot": "Sin cobros este mes.",
+    "cash.period": "Periodo",
+    "cash.mes": "Mes",
+    "cash.t1": "1.er trim.",
+    "cash.t2": "2.º trim.",
+    "cash.t3": "3.er trim.",
+    "cash.t4": "4.º trim.",
+    "cash.year": "Año",
+    "cash.bal": "Balancete",
+    "cash.washes": "Lavados",
+    "cash.openN": "Aún abiertos",
+    "cash.doneN": "Terminados",
+    "cash.cancelN": "Cancelados",
+    "cash.faltaN": "No vino",
+    "cash.billed": "Facturado",
+    "cash.best": "Mejor mes del año",
+    "cash.bestLine": "{month} · {money} · {n} {word}",
+    "cash.wash1": "lavado",
+    "cash.washN": "lavados",
+    "cash.bestNone": "Aún no hay movimiento este año.",
+    "cash.bySvc": "Por servicio",
+    "cash.bySize": "Por tipo de vehículo",
+    "cash.byPay": "Por forma de pago",
+    "cash.yearTable": "Comparativa del año {year}",
+    "cash.quarters": "Trimestres",
+    "cash.colMonth": "Mes",
+    "cash.colN": "Lavados",
+    "cash.colDone": "Terminados",
+    "cash.colGot": "Cobrado",
+    "cash.colPend": "A recibir",
+    "cash.colBill": "Facturado",
+    "cash.total": "Total",
+    "cash.print": "Imprimir",
+    "cash.qty": "Cantidad",
     "more.price": "Precios",
     "more.price2": "Tabla por tipo de vehículo",
     "more.cash": "Caja",
-    "more.cash2": "Cobrado y pendiente",
+    "more.cash2": "Balancete mensual, trimestral y anual",
     "more.team": "Equipo",
     "more.team2": "Quién lava (no es acceso de empleados)",
     "more.shop": "Taller",
@@ -221,7 +254,7 @@ I18N.pt = Object.assign({}, I18N.es, {
   "welcome.p": "Agenda da lavação: clientes, veículos, preços, marcações e aviso da última limpeza. Tudo fica neste telemóvel.",
   "welcome.empty": "Começar com a minha oficina",
   "welcome.demo": "Ver um dia de exemplo",
-  "hoje.washes": "lavagens hoje",
+  "hoje.washes": "lavagens de hoje",
   "hoje.paid": "recebido hoje",
   "hoje.remind": "para lembrar",
   "hoje.due": "por cobrar",
@@ -273,10 +306,43 @@ I18N.pt = Object.assign({}, I18N.es, {
   "cash.nopend": "Nada pendente neste mês.",
   "cash.got": "Recebido",
   "cash.nogot": "Sem recebimentos neste mês.",
+  "cash.period": "Período",
+  "cash.mes": "Mês",
+  "cash.t1": "1.º trim.",
+  "cash.t2": "2.º trim.",
+  "cash.t3": "3.º trim.",
+  "cash.t4": "4.º trim.",
+  "cash.year": "Ano",
+  "cash.bal": "Balancete",
+  "cash.washes": "Lavagens",
+  "cash.openN": "Ainda abertas",
+  "cash.doneN": "Concluídas",
+  "cash.cancelN": "Canceladas",
+  "cash.faltaN": "Não veio",
+  "cash.billed": "Faturado",
+  "cash.best": "Melhor mês do ano",
+  "cash.bestLine": "{month} · {money} · {n} {word}",
+  "cash.wash1": "lavagem",
+  "cash.washN": "lavagens",
+  "cash.bestNone": "Ainda não há movimento neste ano.",
+  "cash.bySvc": "Por serviço",
+  "cash.bySize": "Por tipo de veículo",
+  "cash.byPay": "Por forma de pagamento",
+  "cash.yearTable": "Comparativo do ano {year}",
+  "cash.quarters": "Trimestres",
+  "cash.colMonth": "Mês",
+  "cash.colN": "Lavagens",
+  "cash.colDone": "Concluídas",
+  "cash.colGot": "Recebido",
+  "cash.colPend": "A receber",
+  "cash.colBill": "Faturado",
+  "cash.total": "Total",
+  "cash.print": "Imprimir",
+  "cash.qty": "Quantidade",
   "more.price": "Preços",
   "more.price2": "Tabela por tipo de veículo",
   "more.cash": "Caixa",
-  "more.cash2": "Recebido e por cobrar",
+  "more.cash2": "Balancete mensal, trimestral e anual",
   "more.team": "Equipa",
   "more.team2": "Quem lava",
   "more.shop": "Oficina",
@@ -422,6 +488,7 @@ let db = load();
 let monthCursor = startOfMonth(new Date());
 let selectedDay = isoDate(new Date());
 let clientQuery = "";
+let cashView = "mes";
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -490,7 +557,7 @@ function emptyDb() {
   return {
     version: 1,
     settings: {
-      businessName: "Controle de Lavagens",
+      businessName: "Control de Lavados",
       owner: "",
       phone: "",
       whatsapp: "",
@@ -521,16 +588,27 @@ function load() {
     if (!raw) return emptyDb();
     const data = JSON.parse(raw);
     const base = emptyDb();
-    return {
+    const settings = { ...base.settings, ...(data.settings || {}) };
+    const renamed = settings.businessName === "Controle de Lavagens";
+    if (renamed) settings.businessName = "Control de Lavados";
+    const loaded = {
       ...base,
       ...data,
-      settings: { ...base.settings, ...(data.settings || {}) },
+      settings,
       staff: data.staff?.length ? data.staff : base.staff,
       services: data.services?.length ? data.services : base.services,
       clients: data.clients || [],
       vehicles: data.vehicles || [],
       jobs: data.jobs || [],
     };
+    if (renamed) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(loaded));
+      } catch {
+        /* ignore */
+      }
+    }
+    return loaded;
   } catch {
     return emptyDb();
   }
@@ -581,6 +659,162 @@ function jobTotal(job) {
   const size = vehicle?.size || "berlina";
   const sum = (job.serviceIds || []).reduce((acc, id) => acc + priceOf(serviceById(id), size), 0);
   return Math.max(0, sum - Number(job.discount || 0));
+}
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+function lastIsoDay(year, month) {
+  const day = new Date(Number(year), Number(month), 0).getDate();
+  return `${year}-${pad2(month)}-${pad2(day)}`;
+}
+
+function capWord(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+}
+
+function fmtMonthName(ym) {
+  const [y, m] = String(ym).split("-").map(Number);
+  return capWord(new Date(y, m - 1, 1).toLocaleDateString(loc(), { month: "long" }));
+}
+
+function fmtMonthYear(ym) {
+  const [y, m] = String(ym).split("-").map(Number);
+  return capWord(new Date(y, m - 1, 1).toLocaleDateString(loc(), { month: "long", year: "numeric" }));
+}
+
+function cashBounds() {
+  const y = selectedDay.slice(0, 4);
+  const m = Number(selectedDay.slice(5, 7));
+  if (cashView === "anio") {
+    return { from: `${y}-01-01`, to: `${y}-12-31`, year: y };
+  }
+  if (/^t[1-4]$/.test(cashView)) {
+    const q = Number(cashView[1]);
+    const startM = (q - 1) * 3 + 1;
+    const endM = startM + 2;
+    return { from: `${y}-${pad2(startM)}-01`, to: lastIsoDay(y, endM), year: y, q };
+  }
+  return { from: `${y}-${pad2(m)}-01`, to: lastIsoDay(y, m), year: y, month: m };
+}
+
+function jobsBetween(from, to) {
+  return db.jobs.filter((j) => j.date >= from && j.date <= to);
+}
+
+function sumJobs(jobs) {
+  return jobs.reduce((a, j) => a + jobTotal(j), 0);
+}
+
+function bumpMap(map, key, money) {
+  if (!key) return;
+  const cur = map.get(key) || { n: 0, money: 0 };
+  cur.n += 1;
+  cur.money += money;
+  map.set(key, cur);
+}
+
+function jobTally(jobs) {
+  const done = jobs.filter((j) => j.status === "feito");
+  const open = jobs.filter((j) => j.status === "pedido" || j.status === "confirmado" || j.status === "curso");
+  const paid = jobs.filter((j) => j.paid && j.status !== "cancelado");
+  const pending = jobs.filter((j) => !j.paid && j.status === "feito");
+  const cancelled = jobs.filter((j) => j.status === "cancelado");
+  const falta = jobs.filter((j) => j.status === "falta");
+  const cobrado = sumJobs(paid);
+  const recibir = sumJobs(pending);
+  const byService = new Map();
+  const bySize = new Map();
+  const byPay = new Map();
+  done.forEach((j) => {
+    const vehicle = vehicleById(j.vehicleId);
+    const size = vehicle?.size || "berlina";
+    bumpMap(bySize, t("size." + size), jobTotal(j));
+    (j.serviceIds || []).forEach((sid) => {
+      const svc = serviceById(sid);
+      bumpMap(byService, svc?.name || sid, priceOf(svc, size));
+    });
+  });
+  paid.forEach((j) => bumpMap(byPay, j.payMethod || t("pay.cash"), jobTotal(j)));
+  const sortMap = (map) => [...map.entries()].sort((a, b) => b[1].n - a[1].n || b[1].money - a[1].money);
+  return {
+    done,
+    open,
+    paid,
+    pending,
+    cancelled,
+    falta,
+    nDone: done.length,
+    nOpen: open.length,
+    nPaid: paid.length,
+    nPend: pending.length,
+    nCancel: cancelled.length,
+    nFalta: falta.length,
+    cobrado,
+    recibir,
+    facturado: cobrado + recibir,
+    byService: sortMap(byService),
+    bySize: sortMap(bySize),
+    byPay: sortMap(byPay),
+  };
+}
+
+function yearMonthTallies(year) {
+  return Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    const ym = `${year}-${pad2(month)}`;
+    return { ym, ...jobTally(jobsBetween(`${ym}-01`, lastIsoDay(year, month))) };
+  });
+}
+
+function quarterTallies(year) {
+  return [1, 2, 3, 4].map((q) => {
+    const startM = (q - 1) * 3 + 1;
+    const endM = startM + 2;
+    return {
+      q,
+      label: t("cash.t" + q),
+      ...jobTally(jobsBetween(`${year}-${pad2(startM)}-01`, lastIsoDay(year, endM))),
+    };
+  });
+}
+
+function bestMonthRow(rows) {
+  return rows.reduce((best, row) => {
+    if (!best) return row;
+    if (row.facturado > best.facturado) return row;
+    if (row.facturado === best.facturado && row.nDone > best.nDone) return row;
+    return best;
+  }, null);
+}
+
+function breakdownTable(title, rows) {
+  if (!rows.length) return "";
+  return `
+    <div class="card">
+      <h2>${title}</h2>
+      <div class="table-wrap">
+        <table class="bal">
+          <thead><tr><th></th><th>${t("cash.qty")}</th><th>${t("cash.colBill")}</th></tr></thead>
+          <tbody>
+            ${rows
+              .map(([name, v]) => `<tr><td>${esc(name)}</td><td>${v.n}</td><td>${fmtMoney(v.money)}</td></tr>`)
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function balRow(label, row, max, extraClass = "") {
+  return `<tr class="${extraClass}">
+    <td>${esc(label)}</td>
+    <td>${row.nDone}</td>
+    <td>${fmtMoney(row.cobrado)}</td>
+    <td>${fmtMoney(row.recibir)}</td>
+    <td>${fmtMoney(row.facturado)}</td>
+  </tr>`;
 }
 
 function jobsOn(date) {
@@ -1045,31 +1279,129 @@ function pagePreços() {
 
 function pageCaixa() {
   const month = selectedDay.slice(0, 7);
-  const jobs = db.jobs.filter((j) => j.date.startsWith(month) && j.status !== "cancelado");
-  const paid = jobs.filter((j) => j.paid);
-  const pending = jobs.filter((j) => !j.paid && j.status === "feito");
-  const sum = (arr) => arr.reduce((a, j) => a + jobTotal(j), 0);
+  const year = selectedDay.slice(0, 4);
+  const bounds = cashBounds();
+  const tally = jobTally(jobsBetween(bounds.from, bounds.to));
+  const months = yearMonthTallies(year);
+  const quarters = quarterTallies(year);
+  const yearTally = jobTally(jobsBetween(`${year}-01-01`, `${year}-12-31`));
+  const best = bestMonthRow(months);
+  const hasYearMove = months.some((row) => row.nDone || row.facturado);
+  const maxFact = Math.max(...months.map((row) => row.facturado), ...quarters.map((row) => row.facturado), 1);
+  const views = [
+    ["mes", t("cash.mes")],
+    ["t1", t("cash.t1")],
+    ["t2", t("cash.t2")],
+    ["t3", t("cash.t3")],
+    ["t4", t("cash.t4")],
+    ["anio", t("cash.year")],
+  ];
+  const dateField =
+    cashView === "mes"
+      ? `<label>${t("cash.month")}</label><input type="month" id="caixaMes" value="${month}" />`
+      : `<label>${t("cash.year")}</label><input type="number" id="caixaAno" min="2020" max="2100" value="${year}" />`;
+  const lists =
+    cashView === "mes"
+      ? `<div class="card">
+          <h2>${t("cash.pending")}</h2>
+          ${tally.pending.length ? tally.pending.map(jobItem).join("") : `<p class="empty">${t("cash.nopend")}</p>`}
+        </div>
+        <div class="card">
+          <h2>${t("cash.got")}</h2>
+          ${tally.paid.length ? tally.paid.map(jobItem).join("") : `<p class="empty">${t("cash.nogot")}</p>`}
+        </div>`
+      : "";
   return `
     <div class="card">
-      <label>${t("cash.month")}</label>
-      <input type="month" id="caixaMes" value="${month}" />
+      <div class="row">
+        <h2>${t("cash.bal")}</h2>
+        <button class="btn ghost no-print" data-act="print-cash">${t("cash.print")}</button>
+      </div>
+      <label>${t("cash.period")}</label>
+      <div class="period no-print">
+        ${views
+          .map(
+            ([id, label]) =>
+              `<button type="button" class="${cashView === id ? "on" : ""}" data-act="cash-view" data-view="${id}">${label}</button>`
+          )
+          .join("")}
+      </div>
+      ${dateField}
       <div class="grid" style="margin-top:12px">
-        <div class="stat"><b>${fmtMoney(sum(paid))}</b><span>${t("cash.got")}</span></div>
+        <div class="stat"><b>${tally.nDone}</b><span>${t("cash.washes")}</span></div>
+        <div class="stat"><b>${tally.nOpen}</b><span>${t("cash.openN")}</span></div>
+        <div class="stat"><b>${fmtMoney(tally.cobrado)}</b><span>${t("cash.got")}</span></div>
         <div class="stat">
-          <b>${fmtMoney(sum(pending))}</b>
+          <b>${fmtMoney(tally.recibir)}</b>
           <span>${t("cash.receive")}</span>
-          <small>${t("cash.pendingN", { n: pending.length })}</small>
+          <small>${t("cash.pendingN", { n: tally.nPend })}</small>
+        </div>
+        <div class="stat"><b>${fmtMoney(tally.facturado)}</b><span>${t("cash.billed")}</span></div>
+        <div class="stat">
+          <b>${tally.nCancel + tally.nFalta}</b>
+          <span>${t("cash.cancelN")}</span>
+          <small>${tally.nFalta} ${t("cash.faltaN")}</small>
         </div>
       </div>
     </div>
-    <div class="card">
-      <h2>${t("cash.pending")}</h2>
-      ${pending.length ? pending.map(jobItem).join("") : `<p class="empty">${t("cash.nopend")}</p>`}
+    <div class="card stat-gold">
+      <h2>${t("cash.best")}</h2>
+      ${
+        hasYearMove && best
+          ? `<p class="best-line">${t("cash.bestLine", {
+              month: fmtMonthYear(best.ym),
+              money: fmtMoney(best.facturado),
+              n: best.nDone,
+              word: best.nDone === 1 ? t("cash.wash1") : t("cash.washN"),
+            })}</p>`
+          : `<p class="empty">${t("cash.bestNone")}</p>`
+      }
     </div>
     <div class="card">
-      <h2>${t("cash.got")}</h2>
-      ${paid.length ? paid.map(jobItem).join("") : `<p class="empty">${t("cash.nogot")}</p>`}
-    </div>`;
+      <h2>${t("cash.yearTable", { year })}</h2>
+      <div class="table-wrap">
+        <table class="bal">
+          <thead>
+            <tr>
+              <th>${t("cash.colMonth")}</th>
+              <th>${t("cash.colN")}</th>
+              <th>${t("cash.colGot")}</th>
+              <th>${t("cash.colPend")}</th>
+              <th>${t("cash.colBill")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${months.map((row) => balRow(fmtMonthName(row.ym), row, maxFact, hasYearMove && row.ym === best.ym ? "best" : "")).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h2>${t("cash.quarters")}</h2>
+      <div class="table-wrap">
+        <table class="bal">
+          <thead>
+            <tr>
+              <th></th>
+              <th>${t("cash.colN")}</th>
+              <th>${t("cash.colGot")}</th>
+              <th>${t("cash.colPend")}</th>
+              <th>${t("cash.colBill")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${quarters.map((row) => balRow(row.label, row, maxFact)).join("")}
+          </tbody>
+          <tfoot>
+            ${balRow(t("cash.total") + " " + year, yearTally, maxFact)}
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    ${breakdownTable(t("cash.bySvc"), tally.byService)}
+    ${breakdownTable(t("cash.bySize"), tally.bySize)}
+    ${breakdownTable(t("cash.byPay"), tally.byPay)}
+    ${lists}`;
 }
 
 function pageMais() {
@@ -1491,6 +1823,14 @@ function render() {
       render();
     });
   }
+  const ano = $("caixaAno");
+  if (ano) {
+    ano.addEventListener("change", () => {
+      const year = String(ano.value || selectedDay.slice(0, 4)).padStart(4, "0");
+      selectedDay = year + selectedDay.slice(4);
+      render();
+    });
+  }
   document.querySelectorAll("[data-price]").forEach((input) => {
     input.addEventListener("change", () => {
       const svc = serviceById(input.dataset.price);
@@ -1556,6 +1896,11 @@ document.addEventListener("click", (event) => {
   if (act === "open-job") go("job/" + id);
   if (act === "open-client") go("cliente/" + id);
   if (act === "go") go(btn.dataset.hash);
+  if (act === "cash-view") {
+    cashView = btn.dataset.view || "mes";
+    render();
+  }
+  if (act === "print-cash") window.print();
   if (act === "month") {
     monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + Number(btn.dataset.dir), 1);
     render();
@@ -1703,7 +2048,7 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "save-settings") {
-    db.settings.businessName = $("setName").value.trim() || "Controle de Lavagens";
+    db.settings.businessName = $("setName").value.trim() || t("welcome.h");
     db.settings.whatsapp = $("setWhats").value.trim();
     db.settings.phone = db.settings.whatsapp;
     db.settings.prefix = $("setPrefix").value.trim() || "34";

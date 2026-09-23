@@ -1,12 +1,12 @@
 {
-  "name": "Controle de Lavagens",
-  "short_name": "Lavagens",
-  "description": "Agenda, preços, veículos e lembretes para lavação profissional.",
+  "name": "Control de Lavados",
+  "short_name": "Lavados",
+  "description": "Agenda, precios, vehículos y avisos para un lavadero profesional.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0e7c7b",
   "theme_color": "#0e7c7b",
-  "lang": "pt",
+  "lang": "es",
   "icons": [
     {
       "src": "icon-192.png",

@@ -101,12 +101,26 @@ a { color: var(--teal-dark); }
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 .stat {
   background: var(--foam);
   border-radius: 14px;
-  padding: 12px;
+  padding: 14px 16px;
+  min-height: 76px;
+}
+.stat b {
+  display: block;
+  font-size: 22px;
+  line-height: 1.15;
+}
+.stat span {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
 }
 .stat small { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
 .chips { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
@@ -259,14 +273,61 @@ label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px;
   font-size: 13px;
 }
 
-.badge-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--gold);
+.stat-gold {
+  background: #fff8e6;
+  border-color: #f0d48a;
+}
+.best-line {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--teal-dark);
+}
+.period {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+.period button {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--muted);
+}
+.period button.on {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+}
+.table-wrap { overflow-x: auto; }
+.bal {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.bal th, .bal td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+.bal th:first-child, .bal td:first-child { text-align: left; }
+.bal tr.best { background: #e6f7f6; font-weight: 700; }
+.bal tfoot td { font-weight: 800; border-top: 2px solid var(--ink); }
+.mini-bar {
+  height: 6px;
+  background: var(--teal);
+  border-radius: 99px;
+  margin: 0 0 4px auto;
+  min-width: 4px;
+  max-width: 100%;
 }
 
 @media print {
-  .top, .tabs, .fab, .btn { display: none !important; }
+  .top, .tabs, .fab, .btn, .no-print, .period { display: none !important; }
   body { background: #fff; padding: 0; }
 }
