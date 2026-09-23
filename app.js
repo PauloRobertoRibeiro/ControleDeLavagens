@@ -1,4 +1,5 @@
 const KEY = "controle-lavagens-v1";
+const INSTALL_HIDE = "controle-lavagens-install-hide";
 const SIZES = [
   { id: "citadino" },
   { id: "berlina" },
@@ -132,6 +133,18 @@ const I18N = {
     "more.bak": "Copia de seguridad",
     "more.bak2": "Exportar y restaurar. Sin esto se pierde el taller.",
     "more.foot": "Los datos viven en este móvil. Exporte una copia cada día y guárdela.",
+    "inst.h": "Instalar la app",
+    "inst.p": "Póngala en la pantalla de inicio. Se abre a pantalla completa, como una aplicación, sin el navegador.",
+    "inst.go": "Instalar",
+    "inst.how": "Cómo instalar",
+    "inst.later": "Ahora no",
+    "inst.ok": "App instalada",
+    "inst.ok2": "Ábrala desde el icono Lavados en la pantalla de inicio.",
+    "inst.more": "Instalar en este móvil",
+    "inst.more2": "Pantalla completa, como una aplicación",
+    "inst.android": "En Chrome, toque los tres puntos ⋮ arriba a la derecha. Luego Instalar aplicación o Añadir a pantalla de inicio. Abra el icono Lavados.",
+    "inst.ios": "En Safari, toque el botón Compartir y luego Añadir a pantalla de inicio. Abra el icono Lavados.",
+    "inst.desk": "En el ordenador, use el icono de instalar en la barra de direcciones, o el menú del navegador: Instalar Control de Lavados.",
     "team.note": "Esto es la lista de quién lava, no cuentas de acceso. Para que otro empleado vea el mismo taller: Más → Copia de seguridad → Exportar, y en el otro móvil Restaurar.",
     "team.h": "Equipo",
     "team.add": "+ persona",
@@ -353,6 +366,18 @@ I18N.pt = Object.assign({}, I18N.es, {
   "more.team2": "Quem lava (não é acesso de empregados)",
   "team.note": "Isto é quem lava, não são contas de acesso. Para outro funcionário ver o mesmo: Mais → Cópia → Exportar, e no outro telemóvel Restaurar.",
   "more.foot": "Controle de Lavagens · dados só neste aparelho.",
+  "inst.h": "Instalar a app",
+  "inst.p": "Ponha-a no ecrã inicial. Abre em ecrã inteiro, como uma aplicação, sem o navegador.",
+  "inst.go": "Instalar",
+  "inst.how": "Como instalar",
+  "inst.later": "Agora não",
+  "inst.ok": "App instalada",
+  "inst.ok2": "Abra-a pelo ícone Lavados no ecrã inicial.",
+  "inst.more": "Instalar neste telemóvel",
+  "inst.more2": "Ecrã inteiro, como uma aplicação",
+  "inst.android": "No Chrome, toque nos três pontos ⋮ no canto. Depois Instalar aplicação ou Adicionar ao ecrã inicial. Abra o ícone Lavados.",
+  "inst.ios": "No Safari, toque em Partilhar e depois Adicionar ao ecrã inicial. Abra o ícone Lavados.",
+  "inst.desk": "No computador, use o ícone de instalar na barra de endereço, ou o menu do navegador: Instalar Control de Lavados.",
   "team.h": "Equipa",
   "team.add": "+ pessoa",
   "team.on": "Activo",
@@ -489,6 +514,7 @@ let monthCursor = startOfMonth(new Date());
 let selectedDay = isoDate(new Date());
 let clientQuery = "";
 let cashView = "mes";
+let deferredInstall = null;
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -1023,12 +1049,91 @@ function readyText(job) {
   });
 }
 
+function isStandalone() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function isIos() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function installHidden() {
+  try {
+    return localStorage.getItem(INSTALL_HIDE) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function hideInstallBanner() {
+  try {
+    localStorage.setItem(INSTALL_HIDE, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+function installHowText() {
+  if (isIos()) return t("inst.ios");
+  if (/android/i.test(navigator.userAgent)) return t("inst.android");
+  return t("inst.desk");
+}
+
+function installCard() {
+  if (isStandalone() || installHidden()) return "";
+  return `
+    <div class="card install-card">
+      <h2>${t("inst.h")}</h2>
+      <p>${t("inst.p")}</p>
+      <div class="actions">
+        <button class="btn wide" data-act="install-app">${t("inst.go")}</button>
+        <button class="btn ghost" data-act="install-how">${t("inst.how")}</button>
+        <button class="btn ghost" data-act="install-later">${t("inst.later")}</button>
+      </div>
+    </div>`;
+}
+
+function installSheet() {
+  return `
+    <div class="sheet">
+      <h2>${t("inst.h")}</h2>
+      <p>${t("inst.p")}</p>
+      <p>${esc(installHowText())}</p>
+      <div class="actions">
+        ${deferredInstall ? `<button class="btn wide" data-act="install-native">${t("inst.go")}</button>` : ""}
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
+      </div>
+    </div>`;
+}
+
+async function startInstall() {
+  if (deferredInstall) {
+    try {
+      deferredInstall.prompt();
+      const choice = await deferredInstall.userChoice;
+      deferredInstall = null;
+      if (choice.outcome === "accepted") hideInstallBanner();
+      closeModal();
+      render();
+      return;
+    } catch {
+      /* fall through to instructions */
+    }
+  }
+  openModal(installSheet());
+}
+
 function pageWelcome() {
   $("pageTitle").textContent = t("welcome.empty");
   return `
     <div class="card">
       <h2>${t("welcome.h")}</h2>
       <p>${t("welcome.p")}</p>
+      <p class="muted">${t("inst.p")}</p>
       <div class="actions">
         <button class="btn wide" data-act="start-empty">${t("welcome.empty")}</button>
         <button class="btn ghost wide" data-act="seed">${t("welcome.demo")}</button>
@@ -1045,6 +1150,7 @@ function pageHoje() {
     .filter((j) => j.date === today() && j.paid)
     .reduce((a, j) => a + jobTotal(j), 0);
   return `
+    ${installCard()}
     <div class="grid">
       <div class="stat"><b>${list.length}</b><span>${t("hoje.washes")}</span></div>
       <div class="stat"><b>${fmtMoney(money)}</b><span>${t("hoje.paid")}</span></div>
@@ -1405,8 +1511,12 @@ function pageCaixa() {
 }
 
 function pageMais() {
+  const installRow = isStandalone()
+    ? `<div class="item"><div class="grow"><strong>${t("inst.ok")}</strong><small>${t("inst.ok2")}</small></div></div>`
+    : `<button class="item" data-act="install-app"><div class="grow"><strong>${t("inst.more")}</strong><small>${t("inst.more2")}</small></div></button>`;
   return `
     <div class="list">
+      ${installRow}
       <button class="item" data-act="go" data-hash="caixa"><div class="grow"><strong>${t("more.cash")}</strong><small>${t("more.cash2")}</small></div></button>
       <button class="item" data-act="backup"><div class="grow"><strong>${t("more.bak")}</strong><small>${t("more.bak2")}</small></div></button>
       <button class="item" data-act="go" data-hash="precos"><div class="grow"><strong>${t("more.price")}</strong><small>${t("more.price2")}</small></div></button>
@@ -1896,6 +2006,12 @@ document.addEventListener("click", (event) => {
   if (act === "open-job") go("job/" + id);
   if (act === "open-client") go("cliente/" + id);
   if (act === "go") go(btn.dataset.hash);
+  if (act === "install-app" || act === "install-native") startInstall();
+  if (act === "install-how") openModal(installSheet());
+  if (act === "install-later") {
+    hideInstallBanner();
+    render();
+  }
   if (act === "cash-view") {
     cashView = btn.dataset.view || "mes";
     render();
@@ -2090,12 +2206,15 @@ document.addEventListener("change", (event) => {
 window.addEventListener("hashchange", render);
 render();
 
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstall = event;
+});
+window.addEventListener("appinstalled", () => {
+  deferredInstall = null;
+  hideInstallBanner();
+});
+
 if (location.protocol.startsWith("http") && "serviceWorker" in navigator) {
-  const link = document.createElement("link");
-  link.rel = "manifest";
-  link.href = "manifest.json";
-  document.head.appendChild(link);
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
-  });
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
 }

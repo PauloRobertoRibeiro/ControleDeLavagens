@@ -1,12 +1,17 @@
 {
+  "id": "./",
   "name": "Control de Lavados",
   "short_name": "Lavados",
   "description": "Agenda, precios, vehículos y avisos para un lavadero profesional.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0e7c7b",
   "theme_color": "#0e7c7b",
   "lang": "es",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "icon-192.png",
