@@ -98,7 +98,18 @@ a { color: var(--teal-dark); }
   border-color: var(--warn);
   background: #fff8e6;
 }
-.backup-card p { margin: 0 0 8px; color: var(--ink); font-size: 14px; }
+.setup-card p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.setup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.setup-row span { display: block; font-weight: 700; }
+.setup-row small { display: block; font-weight: 600; color: var(--muted); margin-top: 2px; }
+.setup-row.ok span { color: var(--ok); }
 .muted { color: var(--muted); font-size: 13px; }
 .row {
   display: flex;

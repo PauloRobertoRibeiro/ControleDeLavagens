@@ -163,6 +163,20 @@ const I18N = {
     "shop.lang.pt": "Portugal (portugués)",
     "shop.lang.pt-BR": "Brasil (portugués)",
     "shop.save": "Guardar",
+    "setup.h": "Prepare su lavadero",
+    "setup.p": "Nombre real, quién lava, sus precios. Quite el día de ejemplo si aún está.",
+    "setup.name": "Nombre del lavadero",
+    "setup.staff": "Quién lava",
+    "setup.price": "Revisar precios",
+    "setup.demo": "Quitar el día de ejemplo",
+    "setup.demo2": "Se borran María, João y Ana. Lo que usted creó se queda.",
+    "setup.todo": "Pendiente",
+    "setup.done": "Hecho",
+    "setup.go": "Abrir",
+    "setup.clear": "Quitar ejemplo",
+    "setup.confirm": "Se quitan los clientes de ejemplo y sus citas. Lo que usted creó se queda. ¿Seguir?",
+    "setup.priceOk": "Estos precios están bien",
+    "setup.priceDone": "Precios guardados para su taller.",
     "job.missing": "Cita no encontrada.",
     "job.paid": "Pagado",
     "job.unpaid": "Aún no pagado",
@@ -404,6 +418,20 @@ I18N.pt = Object.assign({}, I18N.es, {
   "shop.cur": "Moeda",
   "shop.lang": "Idioma",
   "shop.save": "Guardar",
+  "setup.h": "Prepare a sua oficina",
+  "setup.p": "Nome real, quem lava, os seus preços. Tire o dia de exemplo se ainda estiver.",
+  "setup.name": "Nome da oficina",
+  "setup.staff": "Quem lava",
+  "setup.price": "Rever preços",
+  "setup.demo": "Tirar o dia de exemplo",
+  "setup.demo2": "Apagam-se Maria, João e Ana. O que criou fica.",
+  "setup.todo": "Por fazer",
+  "setup.done": "Feito",
+  "setup.go": "Abrir",
+  "setup.clear": "Tirar exemplo",
+  "setup.confirm": "Apagam-se os clientes de exemplo e as marcações deles. O que criou fica. Continuar?",
+  "setup.priceOk": "Estes preços estão bem",
+  "setup.priceDone": "Preços guardados para a oficina.",
   "job.missing": "Marcação não encontrada.",
   "job.paid": "Pago",
   "job.unpaid": "Ainda não pago",
@@ -651,6 +679,7 @@ function emptyDb() {
       welcome: true,
       lastBackupAt: "",
       bakSnooze: "",
+      pricesOk: false,
     },
     staff: [{ id: "s1", name: "Operario 1", active: true }],
     services: defaultServices(),
@@ -1170,6 +1199,86 @@ function seedExample() {
 function startEmpty() {
   db.settings.welcome = false;
   save();
+  go("oficina");
+  render();
+}
+
+function foldName(s) {
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function isDemoClient(client) {
+  const n = foldName(client?.name);
+  return n === "maria silva" || n === "joao pereira" || n === "ana costa";
+}
+
+function hasDemoData() {
+  return db.settings.seeded || db.clients.some(isDemoClient);
+}
+
+function isDefaultShopName() {
+  const n = foldName(db.settings.businessName);
+  return !n || n === "control de lavados" || n === "controle de lavagens";
+}
+
+function isDefaultStaff() {
+  const active = db.staff.filter((s) => s.active);
+  if (!active.length) return true;
+  return active.every((s) => {
+    const n = foldName(s.name);
+    return n === "operario 1" || n === "lavador 1";
+  });
+}
+
+function setupItems() {
+  const items = [
+    { id: "name", ok: !isDefaultShopName(), label: t("setup.name"), hash: "oficina" },
+    { id: "staff", ok: !isDefaultStaff(), label: t("setup.staff"), hash: "equipa" },
+    { id: "price", ok: !!db.settings.pricesOk, label: t("setup.price"), hash: "precos" },
+  ];
+  if (hasDemoData()) items.push({ id: "demo", ok: false, label: t("setup.demo"), hash: "" });
+  return items;
+}
+
+function setupDone() {
+  return setupItems().every((x) => x.ok);
+}
+
+function setupCard() {
+  if (db.settings.welcome || setupDone()) return "";
+  const items = setupItems();
+  return `
+    <div class="card setup-card">
+      <h2>${t("setup.h")}</h2>
+      <p>${t("setup.p")}</p>
+      ${items
+        .map((item) => {
+          if (item.id === "demo") {
+            return `<div class="setup-row">
+              <span>${esc(item.label)}<small>${t("setup.demo2")}</small></span>
+              <button class="btn ghost" data-act="clear-demo">${t("setup.clear")}</button>
+            </div>`;
+          }
+          return `<div class="setup-row ${item.ok ? "ok" : ""}">
+            <span>${esc(item.label)}<small>${item.ok ? t("setup.done") : t("setup.todo")}</small></span>
+            ${item.ok ? "" : `<button class="btn ghost" data-act="go" data-hash="${item.hash}">${t("setup.go")}</button>`}
+          </div>`;
+        })
+        .join("")}
+    </div>`;
+}
+
+function clearDemo() {
+  if (!confirm(t("setup.confirm"))) return;
+  const drop = new Set(db.clients.filter(isDemoClient).map((c) => c.id));
+  db.jobs = db.jobs.filter((j) => !drop.has(j.clientId));
+  db.vehicles = db.vehicles.filter((v) => !drop.has(v.clientId));
+  db.clients = db.clients.filter((c) => !drop.has(c.id));
+  db.settings.seeded = false;
+  save();
   render();
 }
 
@@ -1298,6 +1407,7 @@ function pageHoje() {
   return `
     ${installCard()}
     ${backupCard()}
+    ${setupCard()}
     <div class="grid">
       <div class="stat"><b>${list.length}</b><span>${t("hoje.washes")}</span></div>
       <div class="stat"><b>${fmtMoney(money)}</b><span>${t("hoje.paid")}</span></div>
@@ -1378,10 +1488,10 @@ function pageClientes() {
       const plates = vehiclesOf(c.id).map((v) => `${v.plate} ${v.brand} ${v.model}`).join(" ");
       return `${c.name} ${c.phone} ${plates}`.toLowerCase().includes(q);
     })
-    .sort((a, b) => a.name.localeCompare(b.name, "pt"));
+    .sort((a, b) => a.name.localeCompare(b.name, loc()));
   return `
-    <input class="search" id="qClient" placeholder="Nome, telefone ou matrícula" value="${esc(clientQuery)}" />
-    <div class="actions"><button class="btn wide" data-act="new-client">Novo cliente</button></div>
+    <input class="search" id="qClient" placeholder="${esc(t("clients.search"))}" value="${esc(clientQuery)}" />
+    <div class="actions"><button class="btn wide" data-act="new-client">${t("clients.new")}</button></div>
     <div class="list" style="margin-top:10px">
       ${
         rows.length
@@ -1389,18 +1499,18 @@ function pageClientes() {
               .map((c) => {
                 const vs = vehiclesOf(c.id);
                 return `<button class="item" data-act="open-client" data-id="${c.id}">
-                  <div class="grow"><strong>${esc(c.name)}</strong><small>${esc(c.phone || "sem telefone")} · ${vs.length} veículo(s)</small></div>
+                  <div class="grow"><strong>${esc(c.name)}</strong><small>${esc(c.phone || t("clients.nophone"))} · ${vs.length} ${t("clients.vehicles")}</small></div>
                 </button>`;
               })
               .join("")
-          : `<p class="empty">Ainda não há clientes.</p>`
+          : `<p class="empty">${t("clients.none")}</p>`
       }
     </div>`;
 }
 
 function pageCliente(id) {
   const client = clientById(id);
-  if (!client) return `<p class="empty">Cliente não encontrado.</p>`;
+  if (!client) return `<p class="empty">${t("client.missing")}</p>`;
   const vs = vehiclesOf(id);
   const hist = db.jobs
     .filter((j) => j.clientId === id)
@@ -1409,22 +1519,22 @@ function pageCliente(id) {
   return `
     <div class="card">
       <h2>${esc(client.name)}</h2>
-      <p class="muted">${esc(client.phone || "Sem telefone")}${client.email ? " · " + esc(client.email) : ""}</p>
+      <p class="muted">${esc(client.phone || t("client.nophone"))}${client.email ? " · " + esc(client.email) : ""}</p>
       <div class="actions">
-        <button class="btn" data-act="nova" data-client="${client.id}">Marcar lavagem</button>
+        <button class="btn" data-act="nova" data-client="${client.id}">${t("client.book")}</button>
         ${
           client.phone
             ? `<a class="btn gold" target="_blank" rel="noopener" href="${waLink(
                 client.phone,
-                `Olá ${client.name}, aqui é ${db.settings.businessName}.`
+                t("wa.hello", { name: client.name, shop: db.settings.businessName })
               )}">WhatsApp</a>`
             : ""
         }
-        <button class="btn ghost" data-act="edit-client" data-id="${client.id}">Editar</button>
+        <button class="btn ghost" data-act="edit-client" data-id="${client.id}">${t("client.edit")}</button>
       </div>
     </div>
     <div class="card">
-      <div class="row"><h2>Veículos</h2><button class="btn ghost" data-act="new-vehicle" data-client="${client.id}">+ veículo</button></div>
+      <div class="row"><h2>${t("client.vehicles")}</h2><button class="btn ghost" data-act="new-vehicle" data-client="${client.id}">${t("client.addv")}</button></div>
       ${
         vs.length
           ? vs
@@ -1433,17 +1543,17 @@ function pageCliente(id) {
                 return `<button class="item" data-act="edit-vehicle" data-id="${v.id}">
                   <div class="grow">
                     <strong>${esc(vehicleTitle(v))}</strong>
-                    <small>${sizeLabel(v.size)} · última: ${last ? fmtDate(last.date) : "nunca"}</small>
+                    <small>${sizeLabel(v.size)} · ${t("client.last")}: ${last ? fmtDate(last.date) : t("client.never")}</small>
                   </div>
                 </button>`;
               })
               .join("")
-          : `<p class="empty">Sem veículos. Adicione a matrícula.</p>`
+          : `<p class="empty">${t("client.nov")}</p>`
       }
     </div>
     <div class="card">
-      <h2>Histórico</h2>
-      ${hist.length ? hist.map(jobItem).join("") : `<p class="empty">Ainda sem lavagens.</p>`}
+      <h2>${t("client.hist")}</h2>
+      ${hist.length ? hist.map(jobItem).join("") : `<p class="empty">${t("client.nohist")}</p>`}
     </div>`;
 }
 
@@ -1496,12 +1606,12 @@ function pagePreços() {
   const sizes = SIZES;
   return `
     <div class="card">
-      <div class="row"><h2>Tabela de preços</h2><button class="btn ghost" data-act="new-service">+ serviço</button></div>
+      <div class="row"><h2>${t("price.h")}</h2><button class="btn ghost" data-act="new-service">${t("price.add")}</button></div>
       <div style="overflow:auto">
         <table class="price-table">
           <thead>
             <tr>
-              <th>Serviço</th>
+              <th>${t("price.svc")}</th>
               ${sizes.map((s) => `<th>${t("size." + s.id)}</th>`).join("")}
               <th></th>
             </tr>
@@ -1526,7 +1636,10 @@ function pagePreços() {
           </tbody>
         </table>
       </div>
-      <p class="muted">O total da marcação usa o tipo do veículo (citadino, SUV, van…).</p>
+      <p class="muted">${t("price.note")}</p>
+      <div class="actions">
+        <button class="btn wide" data-act="prices-ok">${db.settings.pricesOk ? t("setup.priceDone") : t("setup.priceOk")}</button>
+      </div>
     </div>`;
 }
 
@@ -1693,19 +1806,19 @@ function pageOficina() {
   const s = db.settings;
   return `
     <div class="card">
-      <label>Nome da oficina</label>
+      <label>${t("shop.name")}</label>
       <input id="setName" value="${esc(s.businessName)}" />
-      <label>WhatsApp / telefone</label>
+      <label>${t("shop.wa")}</label>
       <input id="setWhats" value="${esc(s.whatsapp || s.phone)}" placeholder="612 000 000" />
-      <label>Prefixo do país</label>
+      <label>${t("shop.prefix")}</label>
       <input id="setPrefix" value="${esc(s.prefix)}" />
-      <label>Morada</label>
+      <label>${t("shop.addr")}</label>
       <input id="setAddr" value="${esc(s.address)}" />
-      <label>Abre</label>
+      <label>${t("shop.open")}</label>
       <input id="setOpen" type="time" value="${esc(s.openHour)}" />
-      <label>Fecha</label>
+      <label>${t("shop.close")}</label>
       <input id="setClose" type="time" value="${esc(s.closeHour)}" />
-      <label>Lembrar após (dias)</label>
+      <label>${t("shop.days")}</label>
       <input id="setDays" type="number" min="7" max="180" value="${esc(s.reminderDays)}" />
       <label>${t("shop.cur")}</label>
       <select id="setCur">
@@ -1724,7 +1837,7 @@ function pageOficina() {
 
 function pageJob(id) {
   const job = db.jobs.find((j) => j.id === id);
-  if (!job) return `<p class="empty">Marcação não encontrada.</p>`;
+  if (!job) return `<p class="empty">${t("job.missing")}</p>`;
   const client = clientById(job.clientId);
   const vehicle = vehicleById(job.vehicleId);
   const names = (job.serviceIds || []).map((sid) => serviceById(sid)?.name).filter(Boolean);
@@ -1906,15 +2019,15 @@ function jobForm(job, preset = {}) {
 function clientForm(client) {
   return `
     <div class="sheet">
-      <h2>${client ? "Editar cliente" : "Novo cliente"}</h2>
-      <label>Nome</label><input id="cName" value="${esc(client?.name || "")}" />
-      <label>Telefone / WhatsApp</label><input id="cPhone" value="${esc(client?.phone || "")}" inputmode="tel" />
-      <label>E-mail</label><input id="cEmail" value="${esc(client?.email || "")}" />
-      <label>Notas</label><textarea id="cNotes">${esc(client?.notes || "")}</textarea>
+      <h2>${client ? t("form.editc") : t("form.newc")}</h2>
+      <label>${t("form.name")}</label><input id="cName" value="${esc(client?.name || "")}" />
+      <label>${t("form.phone")}</label><input id="cPhone" value="${esc(client?.phone || "")}" inputmode="tel" />
+      <label>${t("form.mail")}</label><input id="cEmail" value="${esc(client?.email || "")}" />
+      <label>${t("form.notes")}</label><textarea id="cNotes">${esc(client?.notes || "")}</textarea>
       <div class="actions">
-        <button class="btn wide" data-act="save-client" data-id="${client?.id || ""}">Guardar</button>
-        ${client ? `<button class="btn danger wide" data-act="del-client" data-id="${client.id}">Apagar cliente</button>` : ""}
-        <button class="btn ghost wide" data-act="close">Fechar</button>
+        <button class="btn wide" data-act="save-client" data-id="${client?.id || ""}">${t("form.save")}</button>
+        ${client ? `<button class="btn danger wide" data-act="del-client" data-id="${client.id}">${t("form.delc")}</button>` : ""}
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
       </div>
     </div>`;
 }
@@ -1923,20 +2036,33 @@ function vehicleForm(vehicle, clientId) {
   const cid = vehicle?.clientId || clientId;
   return `
     <div class="sheet">
-      <h2>${vehicle ? "Editar veículo" : "Novo veículo"}</h2>
-      <label>Matrícula</label><input id="vPlate" value="${esc(vehicle?.plate || "")}" />
-      <label>Marca</label><input id="vBrand" value="${esc(vehicle?.brand || "")}" />
-      <label>Modelo</label><input id="vModel" value="${esc(vehicle?.model || "")}" />
-      <label>Cor</label><input id="vColor" value="${esc(vehicle?.color || "")}" />
-      <label>Tipo</label>
+      <h2>${vehicle ? t("form.editv") : t("form.newv")}</h2>
+      <label>${t("form.plate")}</label><input id="vPlate" value="${esc(vehicle?.plate || "")}" />
+      <label>${t("form.brand")}</label><input id="vBrand" value="${esc(vehicle?.brand || "")}" />
+      <label>${t("form.model")}</label><input id="vModel" value="${esc(vehicle?.model || "")}" />
+      <label>${t("form.color")}</label><input id="vColor" value="${esc(vehicle?.color || "")}" />
+      <label>${t("form.type")}</label>
       <select id="vSize">${SIZES.map(
-        (s) => `<option value="${s.id}" ${s.id === (vehicle?.size || "berlina") ? "selected" : ""}>${s.label}</option>`
+        (s) => `<option value="${s.id}" ${s.id === (vehicle?.size || "berlina") ? "selected" : ""}>${t("size." + s.id)}</option>`
       ).join("")}</select>
-      <label>Notas</label><textarea id="vNotes">${esc(vehicle?.notes || "")}</textarea>
+      <label>${t("form.notes")}</label><textarea id="vNotes">${esc(vehicle?.notes || "")}</textarea>
       <div class="actions">
-        <button class="btn wide" data-act="save-vehicle" data-id="${vehicle?.id || ""}" data-client="${cid}">Guardar</button>
-        ${vehicle ? `<button class="btn danger wide" data-act="del-vehicle" data-id="${vehicle.id}">Apagar veículo</button>` : ""}
-        <button class="btn ghost wide" data-act="close">Fechar</button>
+        <button class="btn wide" data-act="save-vehicle" data-id="${vehicle?.id || ""}" data-client="${cid}">${t("form.save")}</button>
+        ${vehicle ? `<button class="btn danger wide" data-act="del-vehicle" data-id="${vehicle.id}">${t("form.delv")}</button>` : ""}
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
+      </div>
+    </div>`;
+}
+
+function staffSheet(staff) {
+  return `
+    <div class="sheet">
+      <h2>${staff ? t("client.edit") : t("team.add")}</h2>
+      <label>${t("form.name")}</label>
+      <input id="stName" value="${esc(staff?.name || "")}" />
+      <div class="actions">
+        <button class="btn wide" data-act="save-staff" data-id="${staff?.id || ""}">${t("form.save")}</button>
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
       </div>
     </div>`;
 }
@@ -2141,6 +2267,7 @@ document.addEventListener("click", (event) => {
   const id = btn.dataset.id;
 
   if (act === "start-empty") startEmpty();
+  if (act === "clear-demo") clearDemo();
   if (act === "seed") {
     seedExample();
     go("hoje");
@@ -2176,7 +2303,7 @@ document.addEventListener("click", (event) => {
   if (act === "edit-client") openModal(clientForm(clientById(id)));
   if (act === "save-client") {
     const name = $("cName").value.trim();
-    if (!name) return alert("Ponha o nome.");
+    if (!name) return alert(t("alert.name"));
     if (id) {
       const c = clientById(id);
       Object.assign(c, { name, phone: $("cPhone").value.trim(), email: $("cEmail").value.trim(), notes: $("cNotes").value.trim() });
@@ -2195,7 +2322,7 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "del-client") {
-    if (!confirm("Apagar este cliente e os veículos?")) return;
+    if (!confirm(t("alert.delc"))) return;
     db.vehicles = db.vehicles.filter((v) => v.clientId !== id);
     db.clients = db.clients.filter((c) => c.id !== id);
     save();
@@ -2223,7 +2350,7 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "del-vehicle") {
-    if (!confirm("Apagar este veículo?")) return;
+    if (!confirm(t("alert.delv"))) return;
     db.vehicles = db.vehicles.filter((v) => v.id !== id);
     save();
     closeModal();
@@ -2285,7 +2412,7 @@ document.addEventListener("click", (event) => {
   if (act === "new-service") {
     db.services.push({
       id: uid(),
-      name: "Novo serviço",
+      name: t("svc.new"),
       category: "extra",
       durationMin: 30,
       active: true,
@@ -2299,19 +2426,25 @@ document.addEventListener("click", (event) => {
     save();
     render();
   }
-  if (act === "new-staff") {
-    const name = prompt("Nome");
-    if (!name) return;
-    db.staff.push({ id: uid(), name: name.trim(), active: true });
+  if (act === "new-staff") openModal(staffSheet(null));
+  if (act === "edit-staff") openModal(staffSheet(staffById(id)));
+  if (act === "save-staff") {
+    const name = $("stName")?.value.trim();
+    if (!name) return alert(t("alert.name"));
+    if (id) {
+      const s = staffById(id);
+      if (s) s.name = name;
+    } else {
+      db.staff.push({ id: uid(), name, active: true });
+    }
     save();
+    closeModal();
     render();
   }
-  if (act === "edit-staff") {
-    const s = staffById(id);
-    const name = prompt("Nome", s.name);
-    if (!name) return;
-    s.name = name.trim();
+  if (act === "prices-ok") {
+    db.settings.pricesOk = true;
     save();
+    go("hoje");
     render();
   }
   if (act === "save-settings") {
@@ -2326,6 +2459,7 @@ document.addEventListener("click", (event) => {
     db.settings.currency = $("setCur").value;
     db.settings.lang = $("setLang")?.value || "es";
     save();
+    go("hoje");
     render();
   }
   if (act === "backup") {
