@@ -1,20 +1,391 @@
 const KEY = "controle-lavagens-v1";
 const SIZES = [
-  { id: "citadino", label: "Citadino" },
-  { id: "berlina", label: "Berlina" },
-  { id: "suv", label: "SUV" },
-  { id: "van", label: "Van" },
-  { id: "moto", label: "Moto" },
+  { id: "citadino" },
+  { id: "berlina" },
+  { id: "suv" },
+  { id: "van" },
+  { id: "moto" },
 ];
 const STATUS = {
-  pedido: { label: "Pedido", chip: "wait" },
-  confirmado: { label: "Confirmado", chip: "busy" },
-  curso: { label: "Em curso", chip: "busy" },
-  feito: { label: "Concluído", chip: "done" },
-  cancelado: { label: "Cancelado", chip: "stop" },
-  falta: { label: "Não veio", chip: "stop" },
+  pedido: { chip: "wait" },
+  confirmado: { chip: "busy" },
+  curso: { chip: "busy" },
+  feito: { chip: "done" },
+  cancelado: { chip: "stop" },
+  falta: { chip: "stop" },
 };
-const PAY = ["Numerário", "Transferência", "Cartão", "MB Way", "Bizum", "Pendente"];
+const I18N = {
+  es: {
+    "tab.hoje": "Hoy",
+    "tab.agenda": "Agenda",
+    "tab.clientes": "Clientes",
+    "tab.lembretes": "Avisos",
+    "tab.mais": "Más",
+    "title.hoje": "Hoy",
+    "title.agenda": "Agenda",
+    "title.clientes": "Clientes",
+    "title.lembretes": "Avisos",
+    "title.mais": "Más",
+    "title.precos": "Precios",
+    "title.caixa": "Caja",
+    "title.equipa": "Equipo",
+    "title.oficina": "Taller",
+    "title.cliente": "Cliente",
+    "title.job": "Cita",
+    "boot": "Abriendo…",
+    "welcome.h": "Control de Lavados",
+    "welcome.p": "Agenda del lavado: clientes, vehículos, precios, citas y aviso de la última limpieza. Todo queda en este móvil.",
+    "welcome.empty": "Empezar con mi taller",
+    "welcome.demo": "Ver un día de ejemplo",
+    "hoje.washes": "lavados hoy",
+    "hoje.paid": "cobrado hoy",
+    "hoje.remind": "para avisar",
+    "hoje.due": "por cobrar",
+    "hoje.queue": "Cola de hoy",
+    "hoje.empty": "Nada citado para hoy.",
+    "book": "Citar",
+    "agenda.free": "Libre este día.",
+    "cal": "D L M X J V S",
+    "clients.search": "Nombre, teléfono o matrícula",
+    "clients.new": "Nuevo cliente",
+    "clients.none": "Aún no hay clientes.",
+    "clients.nophone": "sin teléfono",
+    "clients.vehicles": "vehículo(s)",
+    "client.missing": "Cliente no encontrado.",
+    "client.nophone": "Sin teléfono",
+    "client.book": "Citar lavado",
+    "client.edit": "Editar",
+    "client.vehicles": "Vehículos",
+    "client.addv": "+ vehículo",
+    "client.last": "última",
+    "client.never": "nunca",
+    "client.nov": "Sin vehículos. Añada la matrícula.",
+    "client.hist": "Historial",
+    "client.nohist": "Aún sin lavados.",
+    "rem.help": "Aviso cuando pasan {days} días del último lavado (Más → Taller).",
+    "rem.over": "Ya pasó el plazo",
+    "rem.week": "Esta semana",
+    "rem.empty": "Nada en esta lista.",
+    "rem.last": "última",
+    "rem.days": "días",
+    "rem.never": "nunca lavó aquí",
+    "rem.next": "sugerido",
+    "rem.long": "mucho tiempo",
+    "rem.norecord": "sin registro",
+    "price.h": "Tabla de precios",
+    "price.add": "+ servicio",
+    "price.svc": "Servicio",
+    "price.note": "El total usa el tipo de vehículo (utilitario, SUV, furgoneta…).",
+    "cash.month": "Mes",
+    "cash.in": "cobrado",
+    "cash.out": "por cobrar",
+    "cash.pending": "Por cobrar",
+    "cash.nopend": "Nada pendiente este mes.",
+    "cash.got": "Cobrado",
+    "cash.nogot": "Sin cobros este mes.",
+    "more.price": "Precios",
+    "more.price2": "Tabla por tipo de vehículo",
+    "more.cash": "Caja",
+    "more.cash2": "Cobrado y pendiente",
+    "more.team": "Equipo",
+    "more.team2": "Quién lava",
+    "more.shop": "Taller",
+    "more.shop2": "Nombre, WhatsApp, horario, días de aviso",
+    "more.bak": "Copia de seguridad",
+    "more.bak2": "Exportar / restaurar JSON",
+    "more.foot": "Control de Lavados · datos solo en este aparato.",
+    "team.h": "Equipo",
+    "team.add": "+ persona",
+    "team.on": "Activo",
+    "team.off": "Inactivo",
+    "shop.name": "Nombre del taller",
+    "shop.wa": "WhatsApp / teléfono",
+    "shop.prefix": "Prefijo del país",
+    "shop.addr": "Dirección",
+    "shop.open": "Abre",
+    "shop.close": "Cierra",
+    "shop.days": "Avisar tras (días)",
+    "shop.cur": "Moneda",
+    "shop.lang": "Idioma",
+    "shop.lang.es": "España (español)",
+    "shop.lang.pt": "Portugal (portugués)",
+    "shop.lang.pt-BR": "Brasil (portugués)",
+    "shop.save": "Guardar",
+    "job.missing": "Cita no encontrada.",
+    "job.paid": "Pagado",
+    "job.unpaid": "Aún no pagado",
+    "job.start": "Empezar",
+    "job.done": "Terminar lavado",
+    "job.pay": "Cobrar",
+    "job.edit": "Editar",
+    "job.warn": "Avisar cita",
+    "job.cancel": "Cancelar",
+    "job.ready": "Ya puede recogerlo",
+    "job.readyDone": "Aviso de recogida enviado",
+    "form.editjob": "Editar cita",
+    "form.newjob": "Nueva cita",
+    "form.client": "Cliente",
+    "form.vehicle": "Vehículo",
+    "form.day": "Día",
+    "form.time": "Hora",
+    "form.who": "Quién lava",
+    "form.state": "Estado",
+    "form.disc": "Descuento",
+    "form.notes": "Notas",
+    "form.save": "Guardar",
+    "form.close": "Cerrar",
+    "form.editc": "Editar cliente",
+    "form.newc": "Nuevo cliente",
+    "form.name": "Nombre",
+    "form.nameHint": "Escriba el nombre. Si el cliente ya existe, elíjalo en la lista.",
+    "form.phone": "Teléfono / WhatsApp",
+    "form.mail": "Correo",
+    "form.delc": "Borrar cliente",
+    "form.editv": "Editar vehículo",
+    "form.newv": "Nuevo vehículo",
+    "form.plate": "Matrícula",
+    "form.brand": "Marca",
+    "form.model": "Modelo",
+    "form.color": "Color",
+    "form.type": "Tipo",
+    "form.delv": "Borrar vehículo",
+    "st.pedido": "Pedido",
+    "st.confirmado": "Confirmado",
+    "st.curso": "En curso",
+    "st.feito": "Terminado",
+    "st.cancelado": "Cancelado",
+    "st.falta": "No vino",
+    "size.citadino": "Utilitario",
+    "size.berlina": "Berlina",
+    "size.suv": "SUV",
+    "size.van": "Furgoneta",
+    "size.moto": "Moto",
+    "pay.list": "Efectivo,Transferencia,Tarjeta,MB Way,Bizum,Pendiente",
+    "pay.cash": "Efectivo",
+    "pay.pend": "Pendiente",
+    "alert.name": "Ponga el nombre.",
+    "alert.delc": "¿Borrar este cliente y los vehículos?",
+    "alert.delv": "¿Borrar este vehículo?",
+    "alert.noclient": "Falta el cliente.",
+    "alert.noveh": "Falta el vehículo.",
+    "alert.nosvc": "Elija al menos un servicio.",
+    "alert.conflict": "Hay otro servicio a la misma hora. ¿Guardar igual?",
+    "alert.pay": "¿Cómo pagó?",
+    "alert.staff": "Nombre",
+    "alert.bak": "No se pudo restaurar: ",
+    "bak.h": "Copia de seguridad",
+    "bak.p": "Guarde el archivo en el móvil o envíeselo por WhatsApp.",
+    "bak.out": "Exportar",
+    "bak.in": "Restaurar",
+    "svc.new": "Nuevo servicio",
+    "staff.1": "Operario 1",
+    "wa.hello": "Hola {name}, le escribe {shop}.",
+    "wa.book": "Hola {name}, el lavado de su {vehicle} quedó citado el {date} a las {time}. {shop}",
+    "wa.remind": "Hola {name}, el último lavado de su {vehicle} fue hace {when} ({last}). ¿Quiere citar el siguiente? {shop}",
+    "wa.ready": "Hola {name}, el lavado de su {vehicle} ya ha terminado. Puede pasar a recogerlo. {shop}",
+    "euro": "Euro",
+    "real": "Real",
+  },
+  pt: {},
+  "pt-BR": {},
+};
+I18N.pt = Object.assign({}, I18N.es, {
+  "tab.hoje": "Hoje",
+  "tab.agenda": "Agenda",
+  "tab.clientes": "Clientes",
+  "tab.lembretes": "Avisos",
+  "tab.mais": "Mais",
+  "title.hoje": "Hoje",
+  "title.agenda": "Agenda",
+  "title.clientes": "Clientes",
+  "title.lembretes": "Avisos",
+  "title.mais": "Mais",
+  "title.precos": "Preços",
+  "title.caixa": "Caixa",
+  "title.equipa": "Equipa",
+  "title.oficina": "Oficina",
+  "title.cliente": "Cliente",
+  "title.job": "Marcação",
+  "boot": "A abrir…",
+  "welcome.h": "Controle de Lavagens",
+  "welcome.p": "Agenda da lavação: clientes, veículos, preços, marcações e aviso da última limpeza. Tudo fica neste telemóvel.",
+  "welcome.empty": "Começar com a minha oficina",
+  "welcome.demo": "Ver um dia de exemplo",
+  "hoje.washes": "lavagens hoje",
+  "hoje.paid": "recebido hoje",
+  "hoje.remind": "para lembrar",
+  "hoje.due": "por cobrar",
+  "hoje.queue": "Fila de hoje",
+  "hoje.empty": "Nada marcado para hoje.",
+  "book": "Marcar",
+  "agenda.free": "Livre neste dia.",
+  "cal": "D S T Q Q S S",
+  "clients.search": "Nome, telefone ou matrícula",
+  "clients.new": "Novo cliente",
+  "clients.none": "Ainda não há clientes.",
+  "clients.nophone": "sem telefone",
+  "clients.vehicles": "veículo(s)",
+  "client.missing": "Cliente não encontrado.",
+  "client.nophone": "Sem telefone",
+  "client.book": "Marcar lavagem",
+  "client.edit": "Editar",
+  "client.addv": "+ veículo",
+  "client.last": "última",
+  "client.never": "nunca",
+  "client.nov": "Sem veículos. Adicione a matrícula.",
+  "client.hist": "Histórico",
+  "client.nohist": "Ainda sem lavagens.",
+  "rem.help": "Aviso quando passam {days} dias da última lavagem (Mais → Oficina).",
+  "rem.over": "Já passou o prazo",
+  "rem.week": "Esta semana",
+  "rem.empty": "Nada nesta lista.",
+  "rem.last": "última",
+  "rem.days": "dias",
+  "rem.never": "nunca lavou aqui",
+  "rem.next": "sugerido",
+  "rem.long": "muito tempo",
+  "rem.norecord": "sem registo",
+  "price.h": "Tabela de preços",
+  "price.add": "+ serviço",
+  "price.svc": "Serviço",
+  "price.note": "O total usa o tipo do veículo (citadino, SUV, van…).",
+  "cash.month": "Mês",
+  "cash.in": "recebido",
+  "cash.out": "por cobrar",
+  "cash.pending": "Por cobrar",
+  "cash.nopend": "Nada pendente neste mês.",
+  "cash.got": "Recebido",
+  "cash.nogot": "Sem recebimentos neste mês.",
+  "more.price": "Preços",
+  "more.price2": "Tabela por tipo de veículo",
+  "more.cash": "Caixa",
+  "more.cash2": "Recebido e por cobrar",
+  "more.team": "Equipa",
+  "more.team2": "Quem lava",
+  "more.shop": "Oficina",
+  "more.shop2": "Nome, WhatsApp, horário, dias de aviso",
+  "more.bak": "Cópia de segurança",
+  "more.bak2": "Exportar / restaurar JSON",
+  "more.foot": "Controle de Lavagens · dados só neste aparelho.",
+  "team.h": "Equipa",
+  "team.add": "+ pessoa",
+  "team.on": "Activo",
+  "team.off": "Inactivo",
+  "shop.name": "Nome da oficina",
+  "shop.wa": "WhatsApp / telefone",
+  "shop.prefix": "Prefixo do país",
+  "shop.addr": "Morada",
+  "shop.open": "Abre",
+  "shop.close": "Fecha",
+  "shop.days": "Lembrar após (dias)",
+  "shop.cur": "Moeda",
+  "shop.lang": "Idioma",
+  "shop.save": "Guardar",
+  "job.missing": "Marcação não encontrada.",
+  "job.paid": "Pago",
+  "job.unpaid": "Ainda não pago",
+  "job.start": "Começar",
+  "job.done": "Terminar lavagem",
+  "job.pay": "Cobrar",
+  "job.edit": "Editar",
+  "job.warn": "Avisar marcação",
+  "job.cancel": "Cancelar",
+  "job.ready": "Já pode vir buscar",
+  "job.readyDone": "Aviso de recolha enviado",
+  "form.editjob": "Editar marcação",
+  "form.newjob": "Nova marcação",
+  "form.client": "Cliente",
+  "form.vehicle": "Veículo",
+  "form.day": "Dia",
+  "form.time": "Hora",
+  "form.who": "Quem lava",
+  "form.state": "Estado",
+  "form.disc": "Desconto",
+  "form.notes": "Notas",
+  "form.save": "Guardar",
+  "form.close": "Fechar",
+  "form.editc": "Editar cliente",
+  "form.newc": "Novo cliente",
+  "form.name": "Nome",
+  "form.nameHint": "Escreva o nome. Se o cliente já existir, escolha na lista.",
+  "form.phone": "Telefone / WhatsApp",
+  "form.mail": "E-mail",
+  "form.delc": "Apagar cliente",
+  "form.delv": "Apagar veículo",
+  "form.editv": "Editar veículo",
+  "form.newv": "Novo veículo",
+  "form.plate": "Matrícula",
+  "form.brand": "Marca",
+  "form.model": "Modelo",
+  "form.color": "Cor",
+  "form.type": "Tipo",
+  "st.pedido": "Pedido",
+  "st.confirmado": "Confirmado",
+  "st.curso": "Em curso",
+  "st.feito": "Concluído",
+  "st.cancelado": "Cancelado",
+  "st.falta": "Não veio",
+  "size.citadino": "Citadino",
+  "size.berlina": "Berlina",
+  "size.suv": "SUV",
+  "size.van": "Van",
+  "size.moto": "Moto",
+  "pay.list": "Numerário,Transferência,Cartão,MB Way,Bizum,Pendente",
+  "pay.cash": "Numerário",
+  "pay.pend": "Pendente",
+  "alert.name": "Ponha o nome.",
+  "alert.delc": "Apagar este cliente e os veículos?",
+  "alert.delv": "Apagar este veículo?",
+  "alert.noclient": "Falta o cliente.",
+  "alert.noveh": "Falta o veículo.",
+  "alert.nosvc": "Escolha pelo menos um serviço.",
+  "alert.conflict": "Há outro serviço à mesma hora. Guardar mesmo assim?",
+  "alert.pay": "Como pagou?",
+  "alert.staff": "Nome",
+  "alert.bak": "Não deu para restaurar: ",
+  "bak.h": "Cópia de segurança",
+  "bak.p": "Guarde o ficheiro no telemóvel ou envie a si mesmo por WhatsApp.",
+  "bak.out": "Exportar",
+  "bak.in": "Restaurar",
+  "svc.new": "Novo serviço",
+  "staff.1": "Lavador 1",
+  "wa.hello": "Olá {name}, aqui é {shop}.",
+  "wa.book": "Olá {name}, a lavagem do {vehicle} ficou marcada para {date} às {time}. {shop}",
+  "wa.remind": "Olá {name}, a última lavagem do {vehicle} foi há {when} ({last}). Quer marcar a próxima? {shop}",
+  "wa.ready": "Olá {name}, a lavagem do {vehicle} já terminou. Pode vir buscá-lo. {shop}",
+});
+I18N["pt-BR"] = Object.assign({}, I18N.pt, {
+  "welcome.p": "Agenda da lavagem: clientes, veículos, preços, marcações e aviso da última limpeza. Tudo fica neste celular.",
+  "staff.1": "Lavador 1",
+  "shop.addr": "Endereço",
+  "job.ready": "Já pode buscar o carro",
+  "wa.ready": "Olá {name}, a lavagem do {vehicle} já terminou. Pode vir buscar. {shop}",
+  "size.citadino": "Popular",
+  "pay.list": "Dinheiro,Transferência,Cartão,Pix,MB Way,Pendente",
+  "pay.cash": "Dinheiro",
+  "bak.p": "Guarde o arquivo no celular ou envie para você no WhatsApp.",
+});
+
+function lang() {
+  const code = db?.settings?.lang || "es";
+  return I18N[code] ? code : "es";
+}
+function t(key, vars) {
+  const pack = I18N[lang()] || I18N.es;
+  let s = pack[key] || I18N.es[key] || key;
+  if (vars) {
+    Object.keys(vars).forEach((k) => {
+      s = s.split("{" + k + "}").join(vars[k]);
+    });
+  }
+  return s;
+}
+function loc() {
+  return { es: "es-ES", pt: "pt-PT", "pt-BR": "pt-BR" }[lang()] || "es-ES";
+}
+function payList() {
+  return t("pay.list").split(",");
+}
 
 const $ = (id) => document.getElementById(id);
 const view = $("view");
@@ -49,12 +420,12 @@ function parseISO(value) {
 function fmtDate(value) {
   if (!value) return "—";
   const d = parseISO(value);
-  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" });
+  return d.toLocaleDateString(loc(), { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function fmtMoney(n) {
   const cur = db.settings.currency || "EUR";
-  return Number(n || 0).toLocaleString("pt-PT", { style: "currency", currency: cur });
+  return Number(n || 0).toLocaleString(loc(), { style: "currency", currency: cur });
 }
 
 function daysBetween(a, b) {
@@ -75,15 +446,15 @@ function defaultServices() {
     prices,
   });
   return [
-    row("Lavagem exterior", "base", 30, { citadino: 12, berlina: 15, suv: 20, van: 25, moto: 8 }),
-    row("Lavagem interior", "base", 40, { citadino: 15, berlina: 18, suv: 25, van: 30, moto: 0 }),
-    row("Lavagem completa", "base", 60, { citadino: 22, berlina: 28, suv: 38, van: 45, moto: 12 }),
+    row("Lavado exterior", "base", 30, { citadino: 12, berlina: 15, suv: 20, van: 25, moto: 8 }),
+    row("Lavado interior", "base", 40, { citadino: 15, berlina: 18, suv: 25, van: 30, moto: 0 }),
+    row("Lavado completo", "base", 60, { citadino: 22, berlina: 28, suv: 38, van: 45, moto: 12 }),
     row("Motor", "extra", 25, { citadino: 20, berlina: 22, suv: 25, van: 28, moto: 15 }),
-    row("Cera / proteção", "extra", 20, { citadino: 15, berlina: 18, suv: 25, van: 30, moto: 10 }),
-    row("Jantes", "extra", 15, { citadino: 10, berlina: 12, suv: 15, van: 18, moto: 8 }),
-    row("Estofos", "premium", 90, { citadino: 40, berlina: 50, suv: 70, van: 80, moto: 0 }),
-    row("Polimento", "premium", 180, { citadino: 80, berlina: 100, suv: 140, van: 160, moto: 40 }),
-    row("Ozono / desinfeção", "extra", 30, { citadino: 25, berlina: 25, suv: 30, van: 35, moto: 15 }),
+    row("Cera / protección", "extra", 20, { citadino: 15, berlina: 18, suv: 25, van: 30, moto: 10 }),
+    row("Llantas", "extra", 15, { citadino: 10, berlina: 12, suv: 15, van: 18, moto: 8 }),
+    row("Tapicería", "premium", 90, { citadino: 40, berlina: 50, suv: 70, van: 80, moto: 0 }),
+    row("Pulido", "premium", 180, { citadino: 80, berlina: 100, suv: 140, van: 160, moto: 40 }),
+    row("Ozono / desinfección", "extra", 30, { citadino: 25, berlina: 25, suv: 30, van: 35, moto: 15 }),
     row("Detailing premium", "premium", 240, { citadino: 120, berlina: 150, suv: 200, van: 240, moto: 60 }),
   ];
 }
@@ -105,10 +476,11 @@ function emptyDb() {
       slotMin: 30,
       workDays: [1, 2, 3, 4, 5, 6],
       reminderDays: 30,
+      lang: "es",
       seeded: false,
       welcome: true,
     },
-    staff: [{ id: "s1", name: "Lavador 1", active: true }],
+    staff: [{ id: "s1", name: "Operario 1", active: true }],
     services: defaultServices(),
     clients: [],
     vehicles: [],
@@ -169,7 +541,7 @@ function lastWash(vehicleId) {
 }
 
 function sizeLabel(id) {
-  return SIZES.find((s) => s.id === id)?.label || id || "—";
+  return t("size." + id) || id || "—";
 }
 
 function priceOf(service, size) {
@@ -251,8 +623,8 @@ function seedExample() {
   const v1 = { id: uid(), clientId: c1.id, plate: "1234 ABC", brand: "VW", model: "Golf", color: "Branco", size: "berlina" };
   const v2 = { id: uid(), clientId: c2.id, plate: "9876 XYZ", brand: "BMW", model: "X3", color: "Preto", size: "suv" };
   const v3 = { id: uid(), clientId: c3.id, plate: "5555 LMN", brand: "Seat", model: "Ibiza", color: "Azul", size: "citadino" };
-  const full = db.services.find((s) => s.name.includes("completa"));
-  const ext = db.services.find((s) => s.name.includes("exterior"));
+  const full = db.services.find((s) => /complet/i.test(s.name));
+  const ext = db.services.find((s) => /exterior/i.test(s.name));
   const old = isoDate(new Date(Date.now() - 42 * 86400000));
   db.clients.push(c1, c2, c3);
   db.vehicles.push(v1, v2, v3);
@@ -323,18 +695,28 @@ function esc(value) {
 
 function chipStatus(status) {
   const meta = STATUS[status] || STATUS.pedido;
-  return `<span class="chip ${meta.chip}">${meta.label}</span>`;
+  return `<span class="chip ${meta.chip}">${t("st." + status)}</span>`;
+}
+
+function readyText(job) {
+  const client = clientById(job.clientId);
+  const vehicle = vehicleById(job.vehicleId);
+  return t("wa.ready", {
+    name: client?.name || "",
+    vehicle: vehicleTitle(vehicle),
+    shop: db.settings.businessName,
+  });
 }
 
 function pageWelcome() {
-  $("pageTitle").textContent = "Começar";
+  $("pageTitle").textContent = t("welcome.empty");
   return `
     <div class="card">
-      <h2>Controle de Lavagens</h2>
-      <p>Agenda da lavação: clientes, veículos, preços, marcações e lembrete da última limpeza. Tudo fica neste telemóvel, sem Play Store.</p>
+      <h2>${t("welcome.h")}</h2>
+      <p>${t("welcome.p")}</p>
       <div class="actions">
-        <button class="btn wide" data-act="start-empty">Começar com a minha oficina</button>
-        <button class="btn ghost wide" data-act="seed">Ver um dia de exemplo</button>
+        <button class="btn wide" data-act="start-empty">${t("welcome.empty")}</button>
+        <button class="btn ghost wide" data-act="seed">${t("welcome.demo")}</button>
       </div>
     </div>`;
 }
@@ -348,14 +730,14 @@ function pageHoje() {
     .reduce((a, j) => a + jobTotal(j), 0);
   return `
     <div class="grid">
-      <div class="stat"><b>${list.length}</b><span>lavagens hoje</span></div>
-      <div class="stat"><b>${fmtMoney(money)}</b><span>recebido hoje</span></div>
-      <div class="stat"><b>${due}</b><span>para lembrar</span></div>
-      <div class="stat"><b>${pending}</b><span>por cobrar</span></div>
+      <div class="stat"><b>${list.length}</b><span>${t("hoje.washes")}</span></div>
+      <div class="stat"><b>${fmtMoney(money)}</b><span>${t("hoje.paid")}</span></div>
+      <div class="stat"><b>${due}</b><span>${t("hoje.remind")}</span></div>
+      <div class="stat"><b>${pending}</b><span>${t("hoje.due")}</span></div>
     </div>
     <div class="card">
-      <div class="row"><h2>Fila de hoje</h2><button class="btn ghost" data-act="nova" data-date="${today()}">Marcar</button></div>
-      ${list.length ? list.map(jobItem).join("") : `<p class="empty">Nada marcado para hoje.</p>`}
+      <div class="row"><h2>${t("hoje.queue")}</h2><button class="btn ghost" data-act="nova" data-date="${today()}">${t("book")}</button></div>
+      ${list.length ? list.map(jobItem).join("") : `<p class="empty">${t("hoje.empty")}</p>`}
     </div>`;
 }
 
@@ -385,7 +767,7 @@ function pageAgenda() {
   }
   const marked = new Set(db.jobs.filter((j) => j.status !== "cancelado").map((j) => j.date));
   const list = jobsOn(selectedDay);
-  const monthName = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
+  const monthName = monthCursor.toLocaleDateString(loc(), { month: "long", year: "numeric" });
   return `
     <div class="card">
       <div class="row">
@@ -394,7 +776,7 @@ function pageAgenda() {
         <button class="btn ghost" data-act="month" data-dir="1">›</button>
       </div>
       <div class="cal" style="margin-top:10px">
-        ${["D", "S", "T", "Q", "Q", "S", "S"].map((d) => `<div class="dow">${d}</div>`).join("")}
+        ${t("cal").split(" ").map((d) => `<div class="dow">${d}</div>`).join("")}
         ${days
           .map((d) => {
             const iso = isoDate(d);
@@ -409,9 +791,9 @@ function pageAgenda() {
     <div class="card">
       <div class="row">
         <h2>${fmtDate(selectedDay)}</h2>
-        <button class="btn" data-act="nova" data-date="${selectedDay}">Marcar</button>
+        <button class="btn" data-act="nova" data-date="${selectedDay}">${t("book")}</button>
       </div>
-      ${list.length ? list.map(jobItem).join("") : `<p class="empty">Livre neste dia.</p>`}
+      ${list.length ? list.map(jobItem).join("") : `<p class="empty">${t("agenda.free")}</p>`}
     </div>`;
 }
 
@@ -642,12 +1024,18 @@ function pageOficina() {
       <input id="setClose" type="time" value="${esc(s.closeHour)}" />
       <label>Lembrar após (dias)</label>
       <input id="setDays" type="number" min="7" max="180" value="${esc(s.reminderDays)}" />
-      <label>Moeda</label>
+      <label>${t("shop.cur")}</label>
       <select id="setCur">
-        <option value="EUR" ${s.currency === "EUR" ? "selected" : ""}>Euro</option>
-        <option value="BRL" ${s.currency === "BRL" ? "selected" : ""}>Real</option>
+        <option value="EUR" ${s.currency === "EUR" ? "selected" : ""}>${t("euro")}</option>
+        <option value="BRL" ${s.currency === "BRL" ? "selected" : ""}>${t("real")}</option>
       </select>
-      <div class="actions"><button class="btn wide" data-act="save-settings">Guardar</button></div>
+      <label>${t("shop.lang")}</label>
+      <select id="setLang">
+        <option value="es" ${s.lang === "es" ? "selected" : ""}>${t("shop.lang.es")}</option>
+        <option value="pt" ${s.lang === "pt" ? "selected" : ""}>${t("shop.lang.pt")}</option>
+        <option value="pt-BR" ${s.lang === "pt-BR" ? "selected" : ""}>${t("shop.lang.pt-BR")}</option>
+      </select>
+      <div class="actions"><button class="btn wide" data-act="save-settings">${t("shop.save")}</button></div>
     </div>`;
 }
 
@@ -663,24 +1051,30 @@ function pageJob(id) {
       <p><strong>${esc(client?.name)}</strong><br><span class="muted">${esc(vehicleTitle(vehicle))}</span></p>
       <p>${esc(names.join(", ") || "Serviço")}</p>
       <p class="total">${fmtMoney(jobTotal(job))}</p>
-      <p class="muted">${job.paid ? "Pago · " + esc(job.payMethod) : "Ainda não pago"} · ${esc(
+      <p class="muted">${job.paid ? t("job.paid") + " · " + esc(job.payMethod) : t("job.unpaid")} · ${esc(
     staffById(job.staffId)?.name || ""
   )}</p>
       ${job.notes ? `<p>${esc(job.notes)}</p>` : ""}
+      ${job.readyNotifiedAt ? `<p class="muted">${t("job.readyDone")} · ${esc(job.readyNotifiedAt)}</p>` : ""}
       <div class="actions">
-        ${job.status !== "curso" && job.status !== "feito" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="curso">Começar</button>` : ""}
-        ${job.status !== "feito" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="feito">Concluir</button>` : ""}
-        ${!job.paid ? `<button class="btn gold" data-act="pay" data-id="${job.id}">Cobrar</button>` : ""}
-        <button class="btn ghost" data-act="edit-job" data-id="${job.id}">Editar</button>
+        ${job.status !== "curso" && job.status !== "feito" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="curso">${t("job.start")}</button>` : ""}
+        ${job.status !== "feito" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="feito">${t("job.done")}</button>` : ""}
+        ${
+          job.status === "feito" && client?.phone && !job.readyNotifiedAt
+            ? `<a class="btn gold" data-act="ready-wa" data-id="${job.id}" target="_blank" rel="noopener" href="${waLink(client.phone, readyText(job))}">${t("job.ready")}</a>`
+            : ""
+        }
+        ${!job.paid ? `<button class="btn gold" data-act="pay" data-id="${job.id}">${t("job.pay")}</button>` : ""}
+        <button class="btn ghost" data-act="edit-job" data-id="${job.id}">${t("job.edit")}</button>
         ${
           client?.phone
             ? `<a class="btn ghost" target="_blank" rel="noopener" href="${waLink(
                 client.phone,
-                `Olá ${client.name}, a lavagem do ${vehicleTitle(vehicle)} ficou marcada para ${fmtDate(job.date)} às ${job.start}. ${db.settings.businessName}`
-              )}">Avisar</a>`
+                t("wa.book", { name: client.name, vehicle: vehicleTitle(vehicle), date: fmtDate(job.date), time: job.start, shop: db.settings.businessName })
+              )}">${t("job.warn")}</a>`
             : ""
         }
-        ${job.status !== "cancelado" && job.status !== "feito" ? `<button class="btn danger" data-act="status" data-id="${job.id}" data-status="cancelado">Cancelar</button>` : ""}
+        ${job.status !== "cancelado" && job.status !== "feito" ? `<button class="btn danger" data-act="status" data-id="${job.id}" data-status="cancelado">${t("job.cancel")}</button>` : ""}
       </div>
     </div>`;
 }
@@ -699,16 +1093,75 @@ function optionsVehicles(clientId, selected) {
     .join("");
 }
 
+function ensureClient(name, phone) {
+  const n = String(name || "").trim();
+  if (!n) return null;
+  const found = db.clients.find((c) => c.name.toLowerCase() === n.toLowerCase());
+  if (found) {
+    if (phone && !found.phone) found.phone = phone;
+    else if (phone) found.phone = phone;
+    return found;
+  }
+  const created = {
+    id: uid(),
+    name: n,
+    phone: String(phone || "").trim(),
+    email: "",
+    notes: "",
+    createdAt: today(),
+  };
+  db.clients.push(created);
+  return created;
+}
+
+function ensureVehicle(clientId, plate, size) {
+  const p = String(plate || "").trim().toUpperCase();
+  if (p) {
+    const hit = db.vehicles.find((v) => v.clientId === clientId && v.plate.toUpperCase() === p);
+    if (hit) {
+      if (size) hit.size = size;
+      return hit;
+    }
+  } else {
+    const first = vehiclesOf(clientId)[0];
+    if (first) return first;
+  }
+  const created = {
+    id: uid(),
+    clientId,
+    plate: p,
+    brand: "",
+    model: "",
+    color: "",
+    size: size || "berlina",
+    notes: "",
+  };
+  db.vehicles.push(created);
+  return created;
+}
+
+function fillFromName() {
+  const name = $("fName")?.value.trim().toLowerCase();
+  if (!name) return;
+  const hit = db.clients.find((c) => c.name.toLowerCase() === name)
+    || db.clients.find((c) => c.name.toLowerCase().includes(name));
+  if (!hit) return;
+  if ($("fPhone") && !$("fPhone").value) $("fPhone").value = hit.phone || "";
+  const vs = vehiclesOf(hit.id);
+  if (vs[0] && $("fPlate") && !$("fPlate").value) $("fPlate").value = vs[0].plate || "";
+  if (vs[0] && $("fSize")) $("fSize").value = vs[0].size || "berlina";
+  refreshJobServices();
+}
+
 function serviceChecks(vehicleId, selectedIds) {
-  const vehicle = vehicleById(vehicleId);
-  const size = vehicle?.size || "berlina";
+  const size = $("fSize")?.value || vehicleById(vehicleId)?.size || "berlina";
   const selected = new Set(selectedIds || []);
   return db.services
     .filter((s) => s.active !== false)
     .map((s) => {
       const p = priceOf(s, size);
       return `<label class="check">
-        <input type="checkbox" data-svc="${s.id}" ${selected.has(s.id) ? "checked" : ""} ${p ? "" : ""} />
+        <input type="checkbox" data-svc="${s.id}" ${selected.has(s.id) ? "checked" : ""} />
         <span class="grow">${esc(s.name)}<br><small>${s.durationMin} min · ${fmtMoney(p)}</small></span>
       </label>`;
     })
@@ -716,44 +1169,50 @@ function serviceChecks(vehicleId, selectedIds) {
 }
 
 function jobForm(job, preset = {}) {
-  const clientId = job?.clientId || preset.clientId || db.clients[0]?.id || "";
-  const vehicleId = job?.vehicleId || preset.vehicleId || vehiclesOf(clientId)[0]?.id || "";
+  const client = clientById(job?.clientId || preset.clientId);
+  const vehicle = vehicleById(job?.vehicleId || preset.vehicleId) || (client ? vehiclesOf(client.id)[0] : null);
   const date = job?.date || preset.date || selectedDay || today();
   const start = job?.start || "10:00";
   const status = job?.status || "confirmado";
   const staffId = job?.staffId || db.staff.find((s) => s.active)?.id || "";
   const serviceIds = job?.serviceIds || [];
   const discount = job?.discount || 0;
+  const size = vehicle?.size || "berlina";
   return `
     <div class="sheet">
-      <h2>${job ? "Editar marcação" : "Nova marcação"}</h2>
-      <label>Cliente</label>
-      <select id="fClient">${optionsClients(clientId)}</select>
-      <button class="btn ghost" type="button" data-act="new-client" style="margin-top:6px">Novo cliente</button>
-      <label>Veículo</label>
-      <select id="fVehicle">${optionsVehicles(clientId, vehicleId)}</select>
-      <button class="btn ghost" type="button" data-act="new-vehicle" data-client="${clientId}" style="margin-top:6px">Novo veículo</button>
-      <label>Dia</label>
+      <h2>${job ? t("form.editjob") : t("form.newjob")}</h2>
+      <label>${t("form.name")}</label>
+      <input id="fName" list="fNames" value="${esc(client?.name || "")}" placeholder="${esc(t("form.nameHint"))}" autocomplete="off" />
+      <datalist id="fNames">${db.clients.map((c) => `<option value="${esc(c.name)}"></option>`).join("")}</datalist>
+      <label>${t("form.phone")}</label>
+      <input id="fPhone" value="${esc(client?.phone || "")}" inputmode="tel" placeholder="612 000 000" />
+      <label>${t("form.plate")}</label>
+      <input id="fPlate" value="${esc(vehicle?.plate || "")}" placeholder="1234 ABC" />
+      <label>${t("form.type")}</label>
+      <select id="fSize">${SIZES.map(
+        (s) => `<option value="${s.id}" ${s.id === size ? "selected" : ""}>${t("size." + s.id)}</option>`
+      ).join("")}</select>
+      <label>${t("form.day")}</label>
       <input id="fDate" type="date" value="${esc(date)}" />
-      <label>Hora</label>
+      <label>${t("form.time")}</label>
       <input id="fStart" type="time" value="${esc(start)}" />
-      <label>Quem lava</label>
+      <label>${t("form.who")}</label>
       <select id="fStaff">${db.staff
         .map((s) => `<option value="${s.id}" ${s.id === staffId ? "selected" : ""}>${esc(s.name)}</option>`)
         .join("")}</select>
-      <label>Estado</label>
-      <select id="fStatus">${Object.entries(STATUS)
-        .map(([k, v]) => `<option value="${k}" ${k === status ? "selected" : ""}>${v.label}</option>`)
+      <label>${t("form.state")}</label>
+      <select id="fStatus">${Object.keys(STATUS)
+        .map((k) => `<option value="${k}" ${k === status ? "selected" : ""}>${t("st." + k)}</option>`)
         .join("")}</select>
-      <div id="svcBox">${serviceChecks(vehicleId, serviceIds)}</div>
-      <label>Desconto</label>
+      <div id="svcBox">${serviceChecks(vehicle?.id, serviceIds)}</div>
+      <label>${t("form.disc")}</label>
       <input id="fDisc" type="number" min="0" step="0.5" value="${esc(discount)}" />
-      <label>Notas</label>
+      <label>${t("form.notes")}</label>
       <textarea id="fNotes">${esc(job?.notes || "")}</textarea>
       <p class="total" id="fTotal">${fmtMoney(job ? jobTotal(job) : 0)}</p>
       <div class="actions">
-        <button class="btn wide" data-act="save-job" data-id="${job?.id || ""}">Guardar</button>
-        <button class="btn ghost wide" data-act="close">Fechar</button>
+        <button class="btn wide" data-act="save-job" data-id="${job?.id || ""}">${t("form.save")}</button>
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
       </div>
     </div>`;
 }
@@ -814,20 +1273,20 @@ function selectedServiceIds() {
 function liveTotal() {
   const totalEl = $("fTotal");
   if (!totalEl) return;
-  const vehicle = vehicleById($("fVehicle")?.value);
-  const size = vehicle?.size || "berlina";
+  const size = $("fSize")?.value || vehicleById($("fVehicle")?.value)?.size || "berlina";
   const sum = selectedServiceIds().reduce((a, id) => a + priceOf(serviceById(id), size), 0);
   const disc = Number($("fDisc")?.value || 0);
   totalEl.textContent = fmtMoney(Math.max(0, sum - disc));
 }
 
 function bindLiveTotal() {
-  modal.querySelectorAll("[data-svc], #fDisc, #fVehicle").forEach((el) => {
+  modal.querySelectorAll("[data-svc], #fDisc, #fSize").forEach((el) => {
     el.addEventListener("change", () => {
-      if (el.id === "fVehicle" || el.id === "fClient") refreshJobServices();
+      if (el.id === "fSize") refreshJobServices();
       liveTotal();
     });
   });
+  $("fName")?.addEventListener("change", fillFromName);
 }
 
 function refreshJobServices() {
@@ -849,10 +1308,9 @@ function collectJob(id) {
   const serviceIds = selectedServiceIds();
   const duration = serviceIds.reduce((a, sid) => a + Number(serviceById(sid)?.durationMin || 30), 0) || Number(db.settings.slotMin || 30);
   const start = $("fStart").value;
+  const prev = id ? db.jobs.find((j) => j.id === id) : null;
   return {
     id: id || uid(),
-    clientId: $("fClient").value,
-    vehicleId: $("fVehicle").value,
     staffId: $("fStaff").value,
     date: $("fDate").value,
     start,
@@ -860,37 +1318,39 @@ function collectJob(id) {
     serviceIds,
     status: $("fStatus").value,
     discount: Number($("fDisc").value || 0),
-    paid: id ? db.jobs.find((j) => j.id === id)?.paid || false : false,
-    payMethod: id ? db.jobs.find((j) => j.id === id)?.payMethod || "Pendente" : "Pendente",
+    paid: prev?.paid || false,
+    payMethod: prev?.payMethod || t("pay.pend"),
     notes: $("fNotes").value.trim(),
   };
 }
 
 function titles() {
   return {
-    hoje: "Hoje",
-    agenda: "Agenda",
-    clientes: "Clientes",
-    lembretes: "Lembretes",
-    mais: "Mais",
-    precos: "Preços",
-    caixa: "Caixa",
-    equipa: "Equipa",
-    oficina: "Oficina",
-    cliente: "Cliente",
-    job: "Marcação",
+    hoje: t("title.hoje"),
+    agenda: t("title.agenda"),
+    clientes: t("title.clientes"),
+    lembretes: t("title.lembretes"),
+    mais: t("title.mais"),
+    precos: t("title.precos"),
+    caixa: t("title.caixa"),
+    equipa: t("title.equipa"),
+    oficina: t("title.oficina"),
+    cliente: t("title.cliente"),
+    job: t("title.job"),
   };
 }
 
 function render() {
   db = load();
-  $("brandName").textContent = db.settings.businessName || "Controle de Lavagens";
+  $("brandName").textContent = db.settings.businessName || t("welcome.h");
   const { page, id } = hashParts();
+  document.documentElement.lang = lang() === "es" ? "es" : "pt";
   document.querySelectorAll(".tabs a").forEach((a) => {
     a.classList.toggle("active", a.dataset.tab === page);
+    a.textContent = t("tab." + a.dataset.tab);
   });
   const map = titles();
-  $("pageTitle").textContent = map[page] || "Controle de Lavagens";
+  $("pageTitle").textContent = map[page] || t("welcome.h");
   $("btnAdd").style.display = db.settings.welcome ? "none" : "inline-flex";
 
   if (db.settings.welcome) {
@@ -988,10 +1448,6 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "nova") {
-    if (!db.clients.length) {
-      openModal(clientForm(null));
-      return;
-    }
     openModal(jobForm(null, { date: btn.dataset.date || selectedDay, clientId: btn.dataset.client, vehicleId: btn.dataset.vehicle }));
     liveTotal();
   }
@@ -1064,11 +1520,15 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "save-job") {
+    const name = $("fName")?.value.trim();
+    if (!name) return alert(t("alert.name"));
     const job = collectJob(id);
-    if (!job.clientId) return alert("Falta o cliente.");
-    if (!job.vehicleId) return alert("Falta o veículo.");
-    if (!job.serviceIds.length) return alert("Escolha pelo menos um serviço.");
-    if (conflict(job) && !confirm("Há outro serviço à mesma hora. Guardar mesmo assim?")) return;
+    if (!job.serviceIds.length) return alert(t("alert.nosvc"));
+    const client = ensureClient(name, $("fPhone")?.value.trim());
+    const vehicle = ensureVehicle(client.id, $("fPlate")?.value, $("fSize")?.value);
+    job.clientId = client.id;
+    job.vehicleId = vehicle.id;
+    if (conflict(job) && !confirm(t("alert.conflict"))) return;
     const i = db.jobs.findIndex((j) => j.id === job.id);
     if (i >= 0) db.jobs[i] = { ...db.jobs[i], ...job };
     else db.jobs.push(job);
@@ -1085,9 +1545,17 @@ document.addEventListener("click", (event) => {
     if (job.status === "feito") {
       const v = vehicleById(job.vehicleId);
       if (v) v.lastServiceAt = job.date;
+      job.readyAt = new Date().toISOString();
     }
     save();
     render();
+  }
+  if (act === "ready-wa") {
+    const job = db.jobs.find((j) => j.id === id);
+    if (job) {
+      job.readyNotifiedAt = new Date().toLocaleString(loc());
+      save();
+    }
   }
   if (act === "pay") {
     const job = db.jobs.find((j) => j.id === id);
@@ -1143,6 +1611,7 @@ document.addEventListener("click", (event) => {
     db.settings.closeHour = $("setClose").value;
     db.settings.reminderDays = Number($("setDays").value || 30);
     db.settings.currency = $("setCur").value;
+    db.settings.lang = $("setLang")?.value || "es";
     save();
     render();
   }
@@ -1164,20 +1633,12 @@ document.addEventListener("click", (event) => {
 
 $("btnAdd").addEventListener("click", () => {
   if (db.settings.welcome) return;
-  if (!db.clients.length) openModal(clientForm(null));
-  else openModal(jobForm(null, { date: selectedDay }));
+  openModal(jobForm(null, { date: selectedDay }));
+  liveTotal();
 });
 
-modal.addEventListener("click", (event) => {
-  if (event.target.id === "fClient") return;
-});
 document.addEventListener("change", (event) => {
-  if (event.target.id === "fClient") {
-    const box = $("fVehicle");
-    if (!box) return;
-    box.innerHTML = optionsVehicles(event.target.value, "");
-    refreshJobServices();
-  }
+  if (event.target.id === "fName") fillFromName();
 });
 
 window.addEventListener("hashchange", render);

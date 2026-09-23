@@ -1,4 +1,4 @@
-const CACHE = "controle-lavagens-v2";
+const CACHE = "controle-lavagens-v3";
 const FILES = [
   "index.html",
   "styles.css",
