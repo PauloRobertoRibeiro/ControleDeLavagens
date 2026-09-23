@@ -9,22 +9,31 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Lavados" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Control de Lavados</title>
+  <title>Recalwash Manresa</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=14" />
   <style>
-    body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: #f4fbfb; color: #102a43; }
+    body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: #0e7c7b; color: #102a43; }
     #boot { padding: 24px 16px; color: #0e7c7b; font-weight: 700; }
   </style>
 </head>
-<body>
+<body class="gated">
+  <div id="gate" class="gate">
+    <div class="gate-logo">
+      <img src="icon-512.png" width="120" height="120" alt="" />
+    </div>
+    <h1 id="gateName">Recalwash Manresa</h1>
+    <p id="gateTag">Control de lavados</p>
+    <button type="button" class="btn-enter" data-act="enter-app">Entrar</button>
+  </div>
+
   <header class="top">
     <div class="brand-row">
       <img class="app-face" src="icon-192.png" width="40" height="40" alt="" />
       <div>
-        <p class="brand" id="brandName">Control de Lavados</p>
+        <p class="brand" id="brandName">Recalwash Manresa</p>
         <h1 id="pageTitle">Hoy</h1>
       </div>
     </div>
@@ -42,6 +51,6 @@
   </nav>
 
   <dialog id="modal" class="modal"></dialog>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

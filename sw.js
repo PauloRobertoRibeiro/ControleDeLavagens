@@ -1,9 +1,10 @@
-const CACHE = "controle-lavagens-v12";
+const CACHE = "controle-lavagens-v14";
 const FILES = [
   "index.html",
   "styles.css",
   "app.js",
   "manifest.json",
+  "privacidad.html",
   "icon-192.png",
   "icon-512.png",
   "apple-touch-icon.png"

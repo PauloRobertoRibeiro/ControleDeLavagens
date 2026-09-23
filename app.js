@@ -1,5 +1,7 @@
 const KEY = "controle-lavagens-v1";
 const INSTALL_HIDE = "controle-lavagens-install-hide";
+const GATE = "controle-lavagens-gate";
+const DEFAULT_SHOP = "Recalwash Manresa";
 const SIZES = [
   { id: "citadino" },
   { id: "berlina" },
@@ -38,6 +40,8 @@ const I18N = {
     "welcome.p": "Agenda del lavado: clientes, vehículos, precios, citas y aviso de la última limpieza. Todo queda en este móvil.",
     "welcome.empty": "Empezar con mi taller",
     "welcome.demo": "Ver un día de ejemplo",
+    "gate.tag": "Control de lavados",
+    "gate.enter": "Entrar",
     "hoje.washes": "lavados de hoy",
     "hoje.paid": "cobrado hoy",
     "hoje.remind": "para avisar",
@@ -133,6 +137,18 @@ const I18N = {
     "more.bak": "Copia de seguridad",
     "more.bak2": "Exportar y restaurar. Sin esto se pierde el taller.",
     "more.foot": "Los datos viven en este móvil. Exporte una copia cada día y guárdela.",
+    "more.priv": "Privacidad",
+    "more.priv2": "Datos en este móvil. Cómo borrar.",
+    "title.priv": "Privacidad",
+    "priv.h": "Sus datos, en este móvil",
+    "priv.p1": "Control de Lavados guarda clientes, vehículos, citas y cobros solo en este aparato. No hay cuenta en internet ni servidor nuestro. Nadie más ve el taller salvo que usted envíe una copia.",
+    "priv.p2": "Si abre WhatsApp desde la app, el mensaje sale en WhatsApp. Si exporta una copia, el archivo es suyo: Drive, USB o un mensaje a usted mismo.",
+    "priv.p3": "Para borrar a un cliente: Clientes → ficha → Editar → Borrar. Para borrar todo el taller en este móvil, use el botón de abajo. Haga antes una copia si quiere recuperarlo.",
+    "priv.resp": "El responsable de los datos del lavadero es quien usa la app en este móvil (el taller), no un servicio en la nube.",
+    "priv.wipe": "Borrar todo en este móvil",
+    "priv.wipe1": "Se borrarán clientes, citas, caja y precios de este móvil. ¿Seguir?",
+    "priv.wipe2": "Esto no se puede deshacer aquí. Solo una copia restaurada lo recupera. ¿Borrar todo?",
+    "priv.done": "Taller borrado en este móvil.",
     "inst.h": "Instalar la app",
     "inst.p": "Póngala en la pantalla de inicio. Se abre a pantalla completa, como una aplicación, sin el navegador.",
     "inst.go": "Instalar",
@@ -151,6 +167,7 @@ const I18N = {
     "team.on": "Activo",
     "team.off": "Inactivo",
     "shop.name": "Nombre del taller",
+    "shop.nameHint": "Este nombre aparece en la pantalla de entrada. Cámbielo si el lavadero es otro.",
     "shop.wa": "WhatsApp / teléfono",
     "shop.prefix": "Prefijo del país",
     "shop.addr": "Dirección",
@@ -293,6 +310,8 @@ I18N.pt = Object.assign({}, I18N.es, {
   "welcome.p": "Agenda da lavação: clientes, veículos, preços, marcações e aviso da última limpeza. Tudo fica neste telemóvel.",
   "welcome.empty": "Começar com a minha oficina",
   "welcome.demo": "Ver um dia de exemplo",
+  "gate.tag": "Controlo de lavagens",
+  "gate.enter": "Entrar",
   "hoje.washes": "lavagens de hoje",
   "hoje.paid": "recebido hoje",
   "hoje.remind": "para lembrar",
@@ -392,6 +411,18 @@ I18N.pt = Object.assign({}, I18N.es, {
   "more.team2": "Quem lava (não é acesso de empregados)",
   "team.note": "Isto é quem lava, não são contas de acesso. Para outro funcionário ver o mesmo: Mais → Cópia → Exportar, e no outro telemóvel Restaurar.",
   "more.foot": "Controle de Lavagens · dados só neste aparelho.",
+  "more.priv": "Privacidade",
+  "more.priv2": "Dados neste telemóvel. Como apagar.",
+  "title.priv": "Privacidade",
+  "priv.h": "Os seus dados, neste telemóvel",
+  "priv.p1": "O Control de Lavados guarda clientes, veículos, marcações e cobros só neste aparelho. Não há conta na internet nem servidor nosso. Ninguém mais vê a oficina a não ser que envie uma cópia.",
+  "priv.p2": "Se abrir o WhatsApp na app, a mensagem sai no WhatsApp. Se exportar uma cópia, o ficheiro é seu: Drive, USB ou uma mensagem a si mesmo.",
+  "priv.p3": "Para apagar um cliente: Clientes → ficha → Editar → Apagar. Para apagar toda a oficina neste telemóvel, use o botão abaixo. Faça antes uma cópia se quiser recuperar.",
+  "priv.resp": "O responsável pelos dados da oficina é quem usa a app neste telemóvel, não um serviço na nuvem.",
+  "priv.wipe": "Apagar tudo neste telemóvel",
+  "priv.wipe1": "Vão-se clientes, marcações, caixa e preços deste telemóvel. Continuar?",
+  "priv.wipe2": "Isto não se desfaz aqui. Só uma cópia restaurada recupera. Apagar tudo?",
+  "priv.done": "Oficina apagada neste telemóvel.",
   "inst.h": "Instalar a app",
   "inst.p": "Ponha-a no ecrã inicial. Abre em ecrã inteiro, como uma aplicação, sem o navegador.",
   "inst.go": "Instalar",
@@ -409,6 +440,7 @@ I18N.pt = Object.assign({}, I18N.es, {
   "team.on": "Activo",
   "team.off": "Inactivo",
   "shop.name": "Nome da oficina",
+  "shop.nameHint": "Este nome aparece no ecrã de entrada. Altere se a oficina for outra.",
   "shop.wa": "WhatsApp / telefone",
   "shop.prefix": "Prefixo do país",
   "shop.addr": "Morada",
@@ -528,6 +560,7 @@ I18N["pt-BR"] = Object.assign({}, I18N.pt, {
   "welcome.p": "Agenda da lavagem: clientes, veículos, preços, marcações e aviso da última limpeza. Tudo fica neste celular.",
   "staff.1": "Lavador 1",
   "shop.addr": "Endereço",
+  "shop.nameHint": "Este nome aparece na tela de entrada. Troque se o lava-rápido for outro.",
   "job.ready": "Já pode buscar o carro",
   "wa.ready": "Olá {name}, a lavagem do {vehicle} já terminou. Pode vir buscar. {shop}",
   "size.citadino": "Popular",
@@ -549,6 +582,9 @@ function t(key, vars) {
     });
   }
   return s;
+}
+function shopName() {
+  return (db?.settings?.businessName || "").trim() || DEFAULT_SHOP;
 }
 function loc() {
   return { es: "es-ES", pt: "pt-PT", "pt-BR": "pt-BR" }[lang()] || "es-ES";
@@ -661,7 +697,7 @@ function emptyDb() {
   return {
     version: 1,
     settings: {
-      businessName: "Control de Lavados",
+      businessName: DEFAULT_SHOP,
       owner: "",
       phone: "",
       whatsapp: "",
@@ -696,8 +732,10 @@ function load() {
     const data = JSON.parse(raw);
     const base = emptyDb();
     const settings = { ...base.settings, ...(data.settings || {}) };
-    const renamed = settings.businessName === "Controle de Lavagens";
-    if (renamed) settings.businessName = "Control de Lavados";
+    const renamed =
+      settings.businessName === "Controle de Lavagens" ||
+      settings.businessName === "Control de Lavados";
+    if (renamed) settings.businessName = DEFAULT_SHOP;
     const loaded = {
       ...base,
       ...data,
@@ -1382,6 +1420,42 @@ async function startInstall() {
   openModal(installSheet());
 }
 
+function gateOpen() {
+  try {
+    return sessionStorage.getItem(GATE) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function fillGate() {
+  const gate = $("gate");
+  if (!gate) return;
+  const name = $("gateName");
+  const tag = $("gateTag");
+  const btn = gate.querySelector("[data-act=enter-app]");
+  if (name) name.textContent = shopName();
+  if (tag) tag.textContent = t("gate.tag");
+  if (btn) btn.textContent = t("gate.enter");
+}
+
+function enterApp() {
+  try {
+    sessionStorage.setItem(GATE, "1");
+  } catch {
+    /* ignore */
+  }
+  if (db.settings.welcome) {
+    db.settings.welcome = false;
+    save();
+  }
+  document.body.classList.remove("gated");
+  const gate = $("gate");
+  if (gate) gate.hidden = true;
+  if (!location.hash || location.hash === "#") location.hash = "#hoje";
+  render();
+}
+
 function pageWelcome() {
   $("pageTitle").textContent = t("welcome.empty");
   return `
@@ -1782,6 +1856,7 @@ function pageMais() {
       <button class="item" data-act="go" data-hash="precos"><div class="grow"><strong>${t("more.price")}</strong><small>${t("more.price2")}</small></div></button>
       <button class="item" data-act="go" data-hash="equipa"><div class="grow"><strong>${t("more.team")}</strong><small>${t("more.team2")}</small></div></button>
       <button class="item" data-act="go" data-hash="oficina"><div class="grow"><strong>${t("more.shop")}</strong><small>${t("more.shop2")}</small></div></button>
+      <button class="item" data-act="go" data-hash="privacidad"><div class="grow"><strong>${t("more.priv")}</strong><small>${t("more.priv2")}</small></div></button>
     </div>
     <p class="muted" style="margin-top:16px">${t("more.foot")}</p>`;
 }
@@ -1808,6 +1883,7 @@ function pageOficina() {
     <div class="card">
       <label>${t("shop.name")}</label>
       <input id="setName" value="${esc(s.businessName)}" />
+      <p class="muted">${t("shop.nameHint")}</p>
       <label>${t("shop.wa")}</label>
       <input id="setWhats" value="${esc(s.whatsapp || s.phone)}" placeholder="612 000 000" />
       <label>${t("shop.prefix")}</label>
@@ -1832,6 +1908,21 @@ function pageOficina() {
         <option value="pt-BR" ${s.lang === "pt-BR" ? "selected" : ""}>${t("shop.lang.pt-BR")}</option>
       </select>
       <div class="actions"><button class="btn wide" data-act="save-settings">${t("shop.save")}</button></div>
+    </div>`;
+}
+
+function pagePrivacidad() {
+  return `
+    <div class="card">
+      <h2>${t("priv.h")}</h2>
+      <p>${t("priv.p1")}</p>
+      <p>${t("priv.p2")}</p>
+      <p>${t("priv.p3")}</p>
+      <p class="muted">${t("priv.resp")}</p>
+      <div class="actions">
+        <button class="btn" data-act="backup">${t("bak.do")}</button>
+        <button class="btn danger wide" data-act="wipe">${t("priv.wipe")}</button>
+      </div>
     </div>`;
 }
 
@@ -2152,6 +2243,7 @@ function titles() {
     caixa: t("title.caixa"),
     equipa: t("title.equipa"),
     oficina: t("title.oficina"),
+    privacidad: t("title.priv"),
     cliente: t("title.cliente"),
     job: t("title.job"),
   };
@@ -2159,16 +2251,26 @@ function titles() {
 
 function render() {
   db = load();
-  $("brandName").textContent = db.settings.businessName || t("welcome.h");
-  const { page, id } = hashParts();
   document.documentElement.lang = lang() === "es" ? "es" : "pt";
+  fillGate();
+  if (!gateOpen()) {
+    document.body.classList.add("gated");
+    const gate = $("gate");
+    if (gate) gate.hidden = false;
+    return;
+  }
+  document.body.classList.remove("gated");
+  const gate = $("gate");
+  if (gate) gate.hidden = true;
+  $("brandName").textContent = shopName();
+  const { page, id } = hashParts();
   document.querySelectorAll(".tabs a").forEach((a) => {
     a.classList.toggle("active", a.dataset.tab === page);
     a.textContent = t("tab." + a.dataset.tab);
   });
   const map = titles();
-  $("pageTitle").textContent = map[page] || t("welcome.h");
-  $("btnAdd").style.display = db.settings.welcome ? "none" : "inline-flex";
+  $("pageTitle").textContent = map[page] || shopName();
+  $("btnAdd").style.display = "inline-flex";
   $("btnAdd").textContent = t("fab");
 
   if (db.settings.welcome) {
@@ -2185,6 +2287,7 @@ function render() {
   else if (page === "mais") view.innerHTML = pageMais();
   else if (page === "equipa") view.innerHTML = pageEquipa();
   else if (page === "oficina") view.innerHTML = pageOficina();
+  else if (page === "privacidad") view.innerHTML = pagePrivacidad();
   else if (page === "job") view.innerHTML = pageJob(id);
   else view.innerHTML = pageHoje();
 
@@ -2266,6 +2369,10 @@ document.addEventListener("click", (event) => {
   const act = btn.dataset.act;
   const id = btn.dataset.id;
 
+  if (act === "enter-app") {
+    enterApp();
+    return;
+  }
   if (act === "start-empty") startEmpty();
   if (act === "clear-demo") clearDemo();
   if (act === "seed") {
@@ -2448,7 +2555,7 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "save-settings") {
-    db.settings.businessName = $("setName").value.trim() || t("welcome.h");
+    db.settings.businessName = $("setName").value.trim() || DEFAULT_SHOP;
     db.settings.whatsapp = $("setWhats").value.trim();
     db.settings.phone = db.settings.whatsapp;
     db.settings.prefix = $("setPrefix").value.trim() || "34";
@@ -2470,6 +2577,20 @@ document.addEventListener("click", (event) => {
     db.settings.bakSnooze = today();
     save();
     render();
+  }
+  if (act === "wipe") {
+    if (!confirm(t("priv.wipe1"))) return;
+    if (!confirm(t("priv.wipe2"))) return;
+    try {
+      localStorage.removeItem(KEY);
+      localStorage.removeItem(INSTALL_HIDE);
+    } catch {
+      /* ignore */
+    }
+    db = emptyDb();
+    alert(t("priv.done"));
+    location.hash = "#hoje";
+    location.reload();
   }
   if (act === "export") backupExport();
   if (act === "import") backupImport();
