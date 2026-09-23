@@ -684,7 +684,7 @@ function waLink(phone, text) {
 
 function vehicleTitle(vehicle) {
   if (!vehicle) return "Veículo";
-  return [vehicle.brand, vehicle.model, vehicle.plate].filter(Boolean).join(" ") || "Veículo";
+  return [vehicle.brand, vehicle.model, vehicle.plate].filter(Boolean).join(" ") || t("form.vehicle");
 }
 
 function hashParts() {
