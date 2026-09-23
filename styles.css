@@ -63,15 +63,21 @@ a { color: var(--teal-dark); }
 .top h1 { margin: 2px 0 0; font-size: 26px; }
 
 .fab {
-  width: 48px;
-  height: 48px;
+  min-width: 48px;
+  height: 44px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--teal);
   color: #fff;
-  font-size: 28px;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1;
   box-shadow: var(--shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 #view { padding: 0 16px 24px; }
@@ -102,8 +108,11 @@ a { color: var(--teal-dark); }
   border-radius: 14px;
   padding: 12px;
 }
-.stat b { display: block; font-size: 22px; }
-.stat span { color: var(--muted); font-size: 12px; }
+.stat small { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.chips { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.warn-box, .ok-box { margin: 8px 0 0; padding: 8px 10px; border-radius: 10px; font-size: 13px; }
+.warn-box { background: #fdecea; color: var(--danger); }
+.ok-box { background: #e6f4ea; color: var(--ok); }
 
 .search, input, select, textarea {
   width: 100%;
@@ -234,8 +243,10 @@ label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px;
 
 .empty {
   text-align: center;
-  padding: 28px 10px;
+  padding: 8px 4px;
+  margin: 0;
   color: var(--muted);
+  font-size: 13px;
 }
 
 .badge-dot {

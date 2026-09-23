@@ -41,9 +41,12 @@ const I18N = {
     "hoje.paid": "cobrado hoy",
     "hoje.remind": "para avisar",
     "hoje.due": "por cobrar",
-    "hoje.queue": "Cola de hoy",
+    "hoje.queue": "Atendimientos de hoy",
+    "hoje.receive": "A recibir",
+    "hoje.pendingN": "{n} pagos pendientes",
     "hoje.empty": "Nada citado para hoy.",
     "book": "Citar",
+    "fab": "+ Cita",
     "agenda.free": "Libre este día.",
     "cal": "D L M X J V S",
     "clients.search": "Nombre, teléfono o matrícula",
@@ -77,9 +80,11 @@ const I18N = {
     "price.svc": "Servicio",
     "price.note": "El total usa el tipo de vehículo (utilitario, SUV, furgoneta…).",
     "cash.month": "Mes",
-    "cash.in": "cobrado",
+    "cash.in": "Cobrado",
     "cash.out": "por cobrar",
-    "cash.pending": "Por cobrar",
+    "cash.receive": "A recibir",
+    "cash.pendingN": "{n} pagos pendientes",
+    "cash.pending": "A recibir",
     "cash.nopend": "Nada pendiente este mes.",
     "cash.got": "Cobrado",
     "cash.nogot": "Sin cobros este mes.",
@@ -88,12 +93,13 @@ const I18N = {
     "more.cash": "Caja",
     "more.cash2": "Cobrado y pendiente",
     "more.team": "Equipo",
-    "more.team2": "Quién lava",
+    "more.team2": "Quién lava (no es acceso de empleados)",
     "more.shop": "Taller",
     "more.shop2": "Nombre, WhatsApp, horario, días de aviso",
     "more.bak": "Copia de seguridad",
-    "more.bak2": "Exportar / restaurar JSON",
-    "more.foot": "Control de Lavados · datos solo en este aparato.",
+    "more.bak2": "Exportar y restaurar. Sin esto se pierde el taller.",
+    "more.foot": "Los datos viven en este móvil. Exporte una copia cada día y guárdela.",
+    "team.note": "Esto es la lista de quién lava, no cuentas de acceso. Para que otro empleado vea el mismo taller: Más → Copia de seguridad → Exportar, y en el otro móvil Restaurar.",
     "team.h": "Equipo",
     "team.add": "+ persona",
     "team.on": "Activo",
@@ -114,10 +120,11 @@ const I18N = {
     "job.missing": "Cita no encontrada.",
     "job.paid": "Pagado",
     "job.unpaid": "Aún no pagado",
-    "job.start": "Empezar",
-    "job.done": "Terminar lavado",
-    "job.pay": "Cobrar",
+    "job.start": "Iniciar",
+    "job.done": "Concluir",
+    "job.pay": "Recibir",
     "job.edit": "Editar",
+    "job.reschedule": "Reprogramar",
     "job.warn": "Avisar cita",
     "job.cancel": "Cancelar",
     "job.ready": "Ya puede recogerlo",
@@ -128,8 +135,11 @@ const I18N = {
     "form.vehicle": "Vehículo",
     "form.day": "Día",
     "form.time": "Hora",
-    "form.who": "Quién lava",
-    "form.state": "Estado",
+    "form.who": "Responsable",
+    "form.duration": "Duración (min)",
+    "form.conflict": "Choque de horario con {who} a las {time}.",
+    "form.noconflict": "Horario libre para este responsable.",
+    "form.state": "Estado del lavado",
     "form.disc": "Descuento",
     "form.notes": "Notas",
     "form.save": "Guardar",
@@ -174,7 +184,7 @@ const I18N = {
     "alert.staff": "Nombre",
     "alert.bak": "No se pudo restaurar: ",
     "bak.h": "Copia de seguridad",
-    "bak.p": "Guarde el archivo en el móvil o envíeselo por WhatsApp.",
+    "bak.p": "Guarde el archivo en el móvil, Drive o WhatsApp. Luego Restaurar. Es la única forma de recuperar el taller si cambia de teléfono.",
     "bak.out": "Exportar",
     "bak.in": "Restaurar",
     "svc.new": "Nuevo servicio",
@@ -215,9 +225,12 @@ I18N.pt = Object.assign({}, I18N.es, {
   "hoje.paid": "recebido hoje",
   "hoje.remind": "para lembrar",
   "hoje.due": "por cobrar",
-  "hoje.queue": "Fila de hoje",
+  "hoje.queue": "Atendimentos de hoje",
+  "hoje.receive": "A receber",
+  "hoje.pendingN": "{n} pagamentos pendentes",
   "hoje.empty": "Nada marcado para hoje.",
   "book": "Marcar",
+  "fab": "+ Marcar",
   "agenda.free": "Livre neste dia.",
   "cal": "D S T Q Q S S",
   "clients.search": "Nome, telefone ou matrícula",
@@ -250,6 +263,10 @@ I18N.pt = Object.assign({}, I18N.es, {
   "price.svc": "Serviço",
   "price.note": "O total usa o tipo do veículo (citadino, SUV, van…).",
   "cash.month": "Mês",
+  "cash.in": "Recebido",
+  "cash.receive": "A receber",
+  "cash.pendingN": "{n} pagamentos pendentes",
+  "cash.pending": "A receber",
   "cash.in": "recebido",
   "cash.out": "por cobrar",
   "cash.pending": "Por cobrar",
@@ -265,7 +282,10 @@ I18N.pt = Object.assign({}, I18N.es, {
   "more.shop": "Oficina",
   "more.shop2": "Nome, WhatsApp, horário, dias de aviso",
   "more.bak": "Cópia de segurança",
-  "more.bak2": "Exportar / restaurar JSON",
+  "more.bak2": "Exportar e restaurar. Sem isto perde a oficina.",
+  "more.foot": "Os dados ficam neste telemóvel. Exporte uma cópia cada dia.",
+  "more.team2": "Quem lava (não é acesso de empregados)",
+  "team.note": "Isto é quem lava, não são contas de acesso. Para outro funcionário ver o mesmo: Mais → Cópia → Exportar, e no outro telemóvel Restaurar.",
   "more.foot": "Controle de Lavagens · dados só neste aparelho.",
   "team.h": "Equipa",
   "team.add": "+ pessoa",
@@ -286,7 +306,10 @@ I18N.pt = Object.assign({}, I18N.es, {
   "job.unpaid": "Ainda não pago",
   "job.start": "Começar",
   "job.done": "Terminar lavagem",
-  "job.pay": "Cobrar",
+  "job.pay": "Receber",
+  "job.start": "Iniciar",
+  "job.done": "Concluir",
+  "job.reschedule": "Remarcar",
   "job.edit": "Editar",
   "job.warn": "Avisar marcação",
   "job.cancel": "Cancelar",
@@ -298,7 +321,11 @@ I18N.pt = Object.assign({}, I18N.es, {
   "form.vehicle": "Veículo",
   "form.day": "Dia",
   "form.time": "Hora",
-  "form.who": "Quem lava",
+  "form.who": "Responsável",
+  "form.duration": "Duração (min)",
+  "form.conflict": "Choque de horário com {who} às {time}.",
+  "form.noconflict": "Horário livre para este responsável.",
+  "form.state": "Estado da lavagem",
   "form.state": "Estado",
   "form.disc": "Desconto",
   "form.notes": "Notas",
@@ -344,7 +371,7 @@ I18N.pt = Object.assign({}, I18N.es, {
   "alert.staff": "Nome",
   "alert.bak": "Não deu para restaurar: ",
   "bak.h": "Cópia de segurança",
-  "bak.p": "Guarde o ficheiro no telemóvel ou envie a si mesmo por WhatsApp.",
+  "bak.p": "Guarde o ficheiro no telemóvel, Drive ou WhatsApp. Depois Restaurar. É a única forma de recuperar a oficina se mudar de telemóvel.",
   "bak.out": "Exportar",
   "bak.in": "Restaurar",
   "svc.new": "Novo serviço",
@@ -562,13 +589,67 @@ function jobsOn(date) {
     .sort((a, b) => String(a.start).localeCompare(String(b.start)));
 }
 
-function conflict(job) {
-  return db.jobs.some((other) => {
+function conflictWith(job) {
+  return db.jobs.find((other) => {
     if (other.id === job.id || other.date !== job.date) return false;
     if (other.status === "cancelado") return false;
     if (other.staffId && job.staffId && other.staffId !== job.staffId) return false;
     return other.start < job.end && job.start < other.end;
-  });
+  }) || null;
+}
+
+function conflict(job) {
+  return Boolean(conflictWith(job));
+}
+
+function draftFromForm(id) {
+  const duration = Number($("fDur")?.value) || selectedDuration();
+  const start = $("fStart")?.value || "10:00";
+  return {
+    id: id || "new",
+    date: $("fDate")?.value,
+    start,
+    end: addMinutes(start, duration),
+    staffId: $("fStaff")?.value,
+    status: "confirmado",
+  };
+}
+
+function selectedDuration() {
+  const typed = Number($("fDur")?.value);
+  const fromSvc = selectedServiceIds().reduce((a, sid) => a + Number(serviceById(sid)?.durationMin || 0), 0);
+  if (typed > 0) return typed;
+  return fromSvc || Number(db.settings.slotMin || 30);
+}
+
+function syncDurationFromServices() {
+  const box = $("fDur");
+  if (!box) return;
+  const fromSvc = selectedServiceIds().reduce((a, sid) => a + Number(serviceById(sid)?.durationMin || 0), 0);
+  if (fromSvc) box.value = fromSvc;
+}
+
+function showConflict(id) {
+  const box = $("fConflict");
+  if (!box) return;
+  const draft = draftFromForm(id);
+  const other = conflictWith(draft);
+  if (other) {
+    box.className = "warn-box";
+    box.textContent = t("form.conflict", {
+      who: staffById(other.staffId)?.name || t("form.who"),
+      time: other.start,
+    });
+  } else {
+    box.className = "ok-box";
+    box.textContent = t("form.noconflict");
+  }
+}
+
+function chipPaid(job) {
+  return job.paid
+    ? `<span class="chip done">${t("job.paid")}</span>`
+    : `<span class="chip stop">${t("job.unpaid")}</span>`;
 }
 
 function dueVehicles() {
@@ -724,16 +805,21 @@ function pageWelcome() {
 function pageHoje() {
   const list = jobsOn(today());
   const due = dueVehicles().filter((x) => x.overdue && x.lastDate).length;
-  const pending = db.jobs.filter((j) => j.status === "feito" && !j.paid).length;
+  const pendingJobs = db.jobs.filter((j) => j.status === "feito" && !j.paid);
+  const pendingMoney = pendingJobs.reduce((a, j) => a + jobTotal(j), 0);
   const money = db.jobs
-    .filter((j) => j.date === today() && j.paid && j.status === "feito")
+    .filter((j) => j.date === today() && j.paid)
     .reduce((a, j) => a + jobTotal(j), 0);
   return `
     <div class="grid">
       <div class="stat"><b>${list.length}</b><span>${t("hoje.washes")}</span></div>
       <div class="stat"><b>${fmtMoney(money)}</b><span>${t("hoje.paid")}</span></div>
+      <div class="stat">
+        <b>${fmtMoney(pendingMoney)}</b>
+        <span>${t("hoje.receive")}</span>
+        <small>${t("hoje.pendingN", { n: pendingJobs.length })}</small>
+      </div>
       <div class="stat"><b>${due}</b><span>${t("hoje.remind")}</span></div>
-      <div class="stat"><b>${pending}</b><span>${t("hoje.due")}</span></div>
     </div>
     <div class="card">
       <div class="row"><h2>${t("hoje.queue")}</h2><button class="btn ghost" data-act="nova" data-date="${today()}">${t("book")}</button></div>
@@ -747,10 +833,10 @@ function jobItem(job) {
   return `
     <button class="item" data-act="open-job" data-id="${job.id}">
       <div class="grow">
-        <strong>${esc(job.start)} · ${esc(client?.name || "Cliente")}</strong>
-        <small>${esc(vehicleTitle(vehicle))} · ${fmtMoney(jobTotal(job))}</small>
+        <strong>${esc(fmtDate(job.date))} · ${esc(job.start)} · ${esc(client?.name || t("title.cliente"))}</strong>
+        <small>${esc(vehicleTitle(vehicle))} · ${fmtMoney(jobTotal(job))} · ${esc(staffById(job.staffId)?.name || "")}</small>
       </div>
-      ${chipStatus(job.status)}
+      <span class="chips">${chipStatus(job.status)}${chipPaid(job)}</span>
     </button>`;
 }
 
@@ -887,33 +973,36 @@ function pageLembretes() {
           ? items
               .map(({ vehicle, lastDate, elapsed, next }) => {
                 const client = clientById(vehicle.clientId);
-                const msg = `Olá ${client?.name || ""}, a última lavagem do ${vehicleTitle(
-                  vehicle
-                )} foi há ${elapsed === 999 ? "muito tempo" : elapsed + " dias"} (${
-                  lastDate ? fmtDate(lastDate) : "sem registo"
-                }). Quer marcar a próxima? ${db.settings.businessName}`;
+                const when = elapsed === 999 ? t("rem.long") : elapsed + " " + t("rem.days");
+                const msg = t("wa.remind", {
+                  name: client?.name || "",
+                  vehicle: vehicleTitle(vehicle),
+                  when,
+                  last: lastDate ? fmtDate(lastDate) : t("rem.norecord"),
+                  shop: db.settings.businessName,
+                });
                 const href = client?.phone ? waLink(client.phone, msg) : "";
                 return `<div class="item">
                   <div class="grow">
-                    <strong>${esc(client?.name || "Cliente")} · ${esc(vehicleTitle(vehicle))}</strong>
+                    <strong>${esc(client?.name || t("title.cliente"))} · ${esc(vehicleTitle(vehicle))}</strong>
                     <small>${
-                      lastDate ? `última ${fmtDate(lastDate)} · ${elapsed} dias` : "nunca lavou aqui"
-                    }${next ? ` · sugerido ${fmtDate(next)}` : ""}</small>
+                      lastDate ? `${t("rem.last")} ${fmtDate(lastDate)} · ${elapsed} ${t("rem.days")}` : t("rem.never")
+                    }${next ? ` · ${t("rem.next")} ${fmtDate(next)}` : ""}</small>
                   </div>
                   <div class="actions" style="margin:0">
                     ${href ? `<a class="btn gold" target="_blank" rel="noopener" href="${href}">WhatsApp</a>` : ""}
-                    <button class="btn" data-act="nova" data-client="${vehicle.clientId}" data-vehicle="${vehicle.id}">Marcar</button>
+                    <button class="btn" data-act="nova" data-client="${vehicle.clientId}" data-vehicle="${vehicle.id}">${t("book")}</button>
                   </div>
                 </div>`;
               })
               .join("")
-          : `<p class="empty">Nada nesta lista.</p>`
+          : `<p class="empty">${t("rem.empty")}</p>`
       }
     </div>`;
   return `
-    <p class="muted">Aviso quando passam ${days} dias da última lavagem (ajuste em Mais → Oficina).</p>
-    ${block("Já passou o prazo", overdue)}
-    ${block("Esta semana", soon)}`;
+    <p class="muted">${t("rem.help", { days })}</p>
+    ${block(t("rem.over"), overdue)}
+    ${block(t("rem.week"), soon)}`;
 }
 
 function pagePreços() {
@@ -926,7 +1015,7 @@ function pagePreços() {
           <thead>
             <tr>
               <th>Serviço</th>
-              ${sizes.map((s) => `<th>${s.label}</th>`).join("")}
+              ${sizes.map((s) => `<th>${t("size." + s.id)}</th>`).join("")}
               <th></th>
             </tr>
           </thead>
@@ -957,49 +1046,54 @@ function pagePreços() {
 function pageCaixa() {
   const month = selectedDay.slice(0, 7);
   const jobs = db.jobs.filter((j) => j.date.startsWith(month) && j.status !== "cancelado");
-  const paid = jobs.filter((j) => j.paid && j.status === "feito");
+  const paid = jobs.filter((j) => j.paid);
   const pending = jobs.filter((j) => !j.paid && j.status === "feito");
   const sum = (arr) => arr.reduce((a, j) => a + jobTotal(j), 0);
   return `
     <div class="card">
-      <label>Mês</label>
+      <label>${t("cash.month")}</label>
       <input type="month" id="caixaMes" value="${month}" />
       <div class="grid" style="margin-top:12px">
-        <div class="stat"><b>${fmtMoney(sum(paid))}</b><span>recebido</span></div>
-        <div class="stat"><b>${fmtMoney(sum(pending))}</b><span>por cobrar</span></div>
+        <div class="stat"><b>${fmtMoney(sum(paid))}</b><span>${t("cash.got")}</span></div>
+        <div class="stat">
+          <b>${fmtMoney(sum(pending))}</b>
+          <span>${t("cash.receive")}</span>
+          <small>${t("cash.pendingN", { n: pending.length })}</small>
+        </div>
       </div>
     </div>
     <div class="card">
-      <h2>Por cobrar</h2>
-      ${pending.length ? pending.map(jobItem).join("") : `<p class="empty">Nada pendente neste mês.</p>`}
+      <h2>${t("cash.pending")}</h2>
+      ${pending.length ? pending.map(jobItem).join("") : `<p class="empty">${t("cash.nopend")}</p>`}
     </div>
     <div class="card">
-      <h2>Recebido</h2>
-      ${paid.length ? paid.map(jobItem).join("") : `<p class="empty">Sem recebimentos neste mês.</p>`}
+      <h2>${t("cash.got")}</h2>
+      ${paid.length ? paid.map(jobItem).join("") : `<p class="empty">${t("cash.nogot")}</p>`}
     </div>`;
 }
 
 function pageMais() {
   return `
     <div class="list">
-      <button class="item" data-act="go" data-hash="precos"><div class="grow"><strong>Preços</strong><small>Tabela por tipo de veículo</small></div></button>
-      <button class="item" data-act="go" data-hash="caixa"><div class="grow"><strong>Caixa</strong><small>Recebido e por cobrar</small></div></button>
-      <button class="item" data-act="go" data-hash="equipa"><div class="grow"><strong>Equipa</strong><small>Quem lava</small></div></button>
-      <button class="item" data-act="go" data-hash="oficina"><div class="grow"><strong>Oficina</strong><small>Nome, WhatsApp, horário, dias de aviso</small></div></button>
-      <button class="item" data-act="backup"><div class="grow"><strong>Cópia de segurança</strong><small>Exportar / restaurar JSON</small></div></button>
+      <button class="item" data-act="go" data-hash="caixa"><div class="grow"><strong>${t("more.cash")}</strong><small>${t("more.cash2")}</small></div></button>
+      <button class="item" data-act="backup"><div class="grow"><strong>${t("more.bak")}</strong><small>${t("more.bak2")}</small></div></button>
+      <button class="item" data-act="go" data-hash="precos"><div class="grow"><strong>${t("more.price")}</strong><small>${t("more.price2")}</small></div></button>
+      <button class="item" data-act="go" data-hash="equipa"><div class="grow"><strong>${t("more.team")}</strong><small>${t("more.team2")}</small></div></button>
+      <button class="item" data-act="go" data-hash="oficina"><div class="grow"><strong>${t("more.shop")}</strong><small>${t("more.shop2")}</small></div></button>
     </div>
-    <p class="muted" style="margin-top:16px">Controle de Lavagens · dados só neste aparelho.</p>`;
+    <p class="muted" style="margin-top:16px">${t("more.foot")}</p>`;
 }
 
 function pageEquipa() {
   return `
     <div class="card">
-      <div class="row"><h2>Equipa</h2><button class="btn ghost" data-act="new-staff">+ pessoa</button></div>
+      <div class="row"><h2>${t("team.h")}</h2><button class="btn ghost" data-act="new-staff">${t("team.add")}</button></div>
+      <p class="muted">${t("team.note")}</p>
       ${db.staff
         .map(
           (s) => `<div class="item">
-            <div class="grow"><strong>${esc(s.name)}</strong><small>${s.active ? "Activo" : "Inactivo"}</small></div>
-            <button class="btn ghost" data-act="edit-staff" data-id="${s.id}">Editar</button>
+            <div class="grow"><strong>${esc(s.name)}</strong><small>${s.active ? t("team.on") : t("team.off")}</small></div>
+            <button class="btn ghost" data-act="edit-staff" data-id="${s.id}">${t("client.edit")}</button>
           </div>`
         )
         .join("")}
@@ -1047,25 +1141,24 @@ function pageJob(id) {
   const names = (job.serviceIds || []).map((sid) => serviceById(sid)?.name).filter(Boolean);
   return `
     <div class="card">
-      <div class="row"><h2>${fmtDate(job.date)} · ${esc(job.start)}</h2>${chipStatus(job.status)}</div>
-      <p><strong>${esc(client?.name)}</strong><br><span class="muted">${esc(vehicleTitle(vehicle))}</span></p>
-      <p>${esc(names.join(", ") || "Serviço")}</p>
+      <div class="row"><h2>${fmtDate(job.date)} · ${esc(job.start)}–${esc(job.end || "")}</h2>
+        <span class="chips">${chipStatus(job.status)}${chipPaid(job)}</span>
+      </div>
+      <p><strong>${esc(client?.name)}</strong><br><span class="muted">${esc(vehicleTitle(vehicle))} · ${esc(staffById(job.staffId)?.name || "")}</span></p>
+      <p>${esc(names.join(", ") || t("price.svc"))}</p>
       <p class="total">${fmtMoney(jobTotal(job))}</p>
-      <p class="muted">${job.paid ? t("job.paid") + " · " + esc(job.payMethod) : t("job.unpaid")} · ${esc(
-    staffById(job.staffId)?.name || ""
-  )}</p>
       ${job.notes ? `<p>${esc(job.notes)}</p>` : ""}
       ${job.readyNotifiedAt ? `<p class="muted">${t("job.readyDone")} · ${esc(job.readyNotifiedAt)}</p>` : ""}
       <div class="actions">
-        ${job.status !== "curso" && job.status !== "feito" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="curso">${t("job.start")}</button>` : ""}
-        ${job.status !== "feito" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="feito">${t("job.done")}</button>` : ""}
+        ${job.status !== "curso" && job.status !== "feito" && job.status !== "cancelado" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="curso">${t("job.start")}</button>` : ""}
+        ${job.status !== "feito" && job.status !== "cancelado" ? `<button class="btn" data-act="status" data-id="${job.id}" data-status="feito">${t("job.done")}</button>` : ""}
+        ${!job.paid && job.status !== "cancelado" ? `<button class="btn gold" data-act="pay" data-id="${job.id}">${t("job.pay")}</button>` : ""}
         ${
           job.status === "feito" && client?.phone && !job.readyNotifiedAt
             ? `<a class="btn gold" data-act="ready-wa" data-id="${job.id}" target="_blank" rel="noopener" href="${waLink(client.phone, readyText(job))}">${t("job.ready")}</a>`
             : ""
         }
-        ${!job.paid ? `<button class="btn gold" data-act="pay" data-id="${job.id}">${t("job.pay")}</button>` : ""}
-        <button class="btn ghost" data-act="edit-job" data-id="${job.id}">${t("job.edit")}</button>
+        ${job.status !== "cancelado" ? `<button class="btn ghost" data-act="edit-job" data-id="${job.id}">${t("job.reschedule")}</button>` : ""}
         ${
           client?.phone
             ? `<a class="btn ghost" target="_blank" rel="noopener" href="${waLink(
@@ -1196,6 +1289,9 @@ function jobForm(job, preset = {}) {
       <input id="fDate" type="date" value="${esc(date)}" />
       <label>${t("form.time")}</label>
       <input id="fStart" type="time" value="${esc(start)}" />
+      <label>${t("form.duration")}</label>
+      <input id="fDur" type="number" min="15" step="5" value="${esc(job?.durationMin || serviceIds.reduce((a, sid) => a + Number(serviceById(sid)?.durationMin || 0), 0) || 30)}" />
+      <p id="fConflict" class="ok-box">${t("form.noconflict")}</p>
       <label>${t("form.who")}</label>
       <select id="fStaff">${db.staff
         .map((s) => `<option value="${s.id}" ${s.id === staffId ? "selected" : ""}>${esc(s.name)}</option>`)
@@ -1280,13 +1376,17 @@ function liveTotal() {
 }
 
 function bindLiveTotal() {
-  modal.querySelectorAll("[data-svc], #fDisc, #fSize").forEach((el) => {
+  const jobId = modal.querySelector("[data-act='save-job']")?.dataset.id || "new";
+  modal.querySelectorAll("[data-svc], #fDisc, #fSize, #fDate, #fStart, #fDur, #fStaff").forEach((el) => {
     el.addEventListener("change", () => {
+      if (el.hasAttribute("data-svc")) syncDurationFromServices();
       if (el.id === "fSize") refreshJobServices();
       liveTotal();
+      showConflict(jobId);
     });
   });
   $("fName")?.addEventListener("change", fillFromName);
+  showConflict(jobId);
 }
 
 function refreshJobServices() {
@@ -1306,7 +1406,7 @@ function addMinutes(time, minutes) {
 
 function collectJob(id) {
   const serviceIds = selectedServiceIds();
-  const duration = serviceIds.reduce((a, sid) => a + Number(serviceById(sid)?.durationMin || 30), 0) || Number(db.settings.slotMin || 30);
+  const duration = selectedDuration();
   const start = $("fStart").value;
   const prev = id ? db.jobs.find((j) => j.id === id) : null;
   return {
@@ -1314,6 +1414,7 @@ function collectJob(id) {
     staffId: $("fStaff").value,
     date: $("fDate").value,
     start,
+    durationMin: duration,
     end: addMinutes(start, duration),
     serviceIds,
     status: $("fStatus").value,
@@ -1352,6 +1453,7 @@ function render() {
   const map = titles();
   $("pageTitle").textContent = map[page] || t("welcome.h");
   $("btnAdd").style.display = db.settings.welcome ? "none" : "inline-flex";
+  $("btnAdd").textContent = t("fab");
 
   if (db.settings.welcome) {
     view.innerHTML = pageWelcome();
@@ -1560,11 +1662,10 @@ document.addEventListener("click", (event) => {
   if (act === "pay") {
     const job = db.jobs.find((j) => j.id === id);
     if (!job) return;
-    const method = prompt("Como pagou?", job.payMethod === "Pendente" ? "Numerário" : job.payMethod);
+    const method = prompt(t("alert.pay"), job.payMethod === t("pay.pend") || job.payMethod === "Pendente" ? t("pay.cash") : job.payMethod);
     if (!method) return;
     job.paid = true;
     job.payMethod = method;
-    job.status = "feito";
     save();
     render();
   }
