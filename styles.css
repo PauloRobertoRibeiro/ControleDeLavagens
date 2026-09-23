@@ -193,7 +193,16 @@ label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px;
 .btn.gold { background: var(--gold); color: #102a43; }
 .btn.danger { background: var(--danger); }
 .btn.wide { width: 100%; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.pay-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+.pay-btn {
+  min-height: 56px;
+  font-size: 16px;
+}
 
 .cal {
   display: grid;

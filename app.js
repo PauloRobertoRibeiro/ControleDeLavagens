@@ -216,9 +216,10 @@ const I18N = {
     "size.suv": "SUV",
     "size.van": "Furgoneta",
     "size.moto": "Moto",
-    "pay.list": "Efectivo,Transferencia,Tarjeta,MB Way,Bizum,Pendiente",
+    "pay.list": "Efectivo,Transferencia,Tarjeta,Bizum,MB Way,Pendiente",
     "pay.cash": "Efectivo",
     "pay.pend": "Pendiente",
+    "pay.done": "Pagado con {method}",
     "alert.name": "Ponga el nombre.",
     "alert.delc": "¿Borrar este cliente y los vehículos?",
     "alert.delv": "¿Borrar este vehículo?",
@@ -462,6 +463,7 @@ I18N.pt = Object.assign({}, I18N.es, {
   "pay.list": "Numerário,Transferência,Cartão,MB Way,Bizum,Pendente",
   "pay.cash": "Numerário",
   "pay.pend": "Pendente",
+  "pay.done": "Pago com {method}",
   "alert.name": "Ponha o nome.",
   "alert.delc": "Apagar este cliente e os veículos?",
   "alert.delv": "Apagar este veículo?",
@@ -524,7 +526,33 @@ function loc() {
   return { es: "es-ES", pt: "pt-PT", "pt-BR": "pt-BR" }[lang()] || "es-ES";
 }
 function payList() {
-  return t("pay.list").split(",");
+  return t("pay.list").split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function payMethods() {
+  const pend = [t("pay.pend"), "Pendiente", "Pendente"].map((s) => s.toLowerCase());
+  return payList().filter((m) => !pend.includes(m.toLowerCase()));
+}
+
+function paySheet(job) {
+  const client = clientById(job.clientId);
+  return `
+    <div class="sheet">
+      <h2>${t("alert.pay")}</h2>
+      <p class="total">${fmtMoney(jobTotal(job))}</p>
+      <p class="muted">${esc(client?.name || "")}</p>
+      <div class="pay-grid">
+        ${payMethods()
+          .map(
+            (m) =>
+              `<button class="btn pay-btn" data-act="pay-ok" data-id="${job.id}" data-method="${esc(m)}">${esc(m)}</button>`
+          )
+          .join("")}
+      </div>
+      <div class="actions">
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
+      </div>
+    </div>`;
 }
 
 const $ = (id) => document.getElementById(id);
@@ -1708,6 +1736,7 @@ function pageJob(id) {
       <p><strong>${esc(client?.name)}</strong><br><span class="muted">${esc(vehicleTitle(vehicle))} · ${esc(staffById(job.staffId)?.name || "")}</span></p>
       <p>${esc(names.join(", ") || t("price.svc"))}</p>
       <p class="total">${fmtMoney(jobTotal(job))}</p>
+      ${job.paid ? `<p class="ok-box">${t("pay.done", { method: job.payMethod || t("pay.cash") })}</p>` : ""}
       ${job.notes ? `<p>${esc(job.notes)}</p>` : ""}
       ${job.readyNotifiedAt ? `<p class="muted">${t("job.readyDone")} · ${esc(job.readyNotifiedAt)}</p>` : ""}
       <div class="actions">
@@ -2241,11 +2270,15 @@ document.addEventListener("click", (event) => {
   if (act === "pay") {
     const job = db.jobs.find((j) => j.id === id);
     if (!job) return;
-    const method = prompt(t("alert.pay"), job.payMethod === t("pay.pend") || job.payMethod === "Pendente" ? t("pay.cash") : job.payMethod);
-    if (!method) return;
+    openModal(paySheet(job));
+  }
+  if (act === "pay-ok") {
+    const job = db.jobs.find((j) => j.id === id);
+    if (!job) return;
     job.paid = true;
-    job.payMethod = method;
+    job.payMethod = btn.dataset.method || t("pay.cash");
     save();
+    closeModal();
     render();
   }
   if (act === "close") closeModal();
