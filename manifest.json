@@ -1,0 +1,24 @@
+{
+  "name": "Controle de Lavagens",
+  "short_name": "Lavagens",
+  "description": "Agenda, preços, veículos e lembretes para lavação profissional.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0e7c7b",
+  "theme_color": "#0e7c7b",
+  "lang": "pt",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
