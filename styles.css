@@ -94,7 +94,11 @@ a { color: var(--teal-dark); }
   border-color: var(--teal);
   background: linear-gradient(#fff, #e6f7f6);
 }
-.install-card p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.backup-card {
+  border-color: var(--warn);
+  background: #fff8e6;
+}
+.backup-card p { margin: 0 0 8px; color: var(--ink); font-size: 14px; }
 .muted { color: var(--muted); font-size: 13px; }
 .row {
   display: flex;

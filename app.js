@@ -230,9 +230,20 @@ const I18N = {
     "alert.staff": "Nombre",
     "alert.bak": "No se pudo restaurar: ",
     "bak.h": "Copia de seguridad",
-    "bak.p": "Guarde el archivo en el móvil, Drive o WhatsApp. Luego Restaurar. Es la única forma de recuperar el taller si cambia de teléfono.",
-    "bak.out": "Exportar",
+    "bak.p": "Guarde el archivo fuera de este móvil: Drive, WhatsApp (envíeselo a usted mismo) o USB. Restaurar lo recupera. Sin esto, si el teléfono se pierde, se pierde el taller.",
+    "bak.out": "Guardar archivo",
     "bak.in": "Restaurar",
+    "bak.share": "Enviar (WhatsApp, Drive…)",
+    "bak.shareText": "Copia de Control de Lavados. Guárdela fuera de este móvil.",
+    "bak.never": "Aún no hay copia",
+    "bak.last": "Última copia: {when}",
+    "bak.today": "hoy",
+    "bak.days": "hace {n} días",
+    "bak.warn": "Sin copia reciente. Si este móvil se pierde, se pierde el taller.",
+    "bak.do": "Hacer copia",
+    "bak.later": "Hoy no",
+    "bak.ok": "Copia lista. Guarde el archivo fuera de este móvil.",
+    "bak.confirm": "Esto sustituye todos los datos de este móvil. ¿Continuar?",
     "svc.new": "Nuevo servicio",
     "staff.1": "Operario 1",
     "wa.hello": "Hola {name}, le escribe {shop}.",
@@ -462,9 +473,20 @@ I18N.pt = Object.assign({}, I18N.es, {
   "alert.staff": "Nome",
   "alert.bak": "Não deu para restaurar: ",
   "bak.h": "Cópia de segurança",
-  "bak.p": "Guarde o ficheiro no telemóvel, Drive ou WhatsApp. Depois Restaurar. É a única forma de recuperar a oficina se mudar de telemóvel.",
-  "bak.out": "Exportar",
+  "bak.p": "Guarde o ficheiro fora deste telemóvel: Drive, WhatsApp (envie a si mesmo) ou USB. Restaurar recupera. Sem isto, se o telemóvel se perde, perde a oficina.",
+  "bak.out": "Guardar ficheiro",
   "bak.in": "Restaurar",
+  "bak.share": "Enviar (WhatsApp, Drive…)",
+  "bak.shareText": "Cópia de Control de Lavados. Guarde-a fora deste telemóvel.",
+  "bak.never": "Ainda não há cópia",
+  "bak.last": "Última cópia: {when}",
+  "bak.today": "hoje",
+  "bak.days": "há {n} dias",
+  "bak.warn": "Sem cópia recente. Se este telemóvel se perder, perde a oficina.",
+  "bak.do": "Fazer cópia",
+  "bak.later": "Hoje não",
+  "bak.ok": "Cópia pronta. Guarde o ficheiro fora deste telemóvel.",
+  "bak.confirm": "Isto substitui todos os dados deste telemóvel. Continuar?",
   "svc.new": "Novo serviço",
   "staff.1": "Lavador 1",
   "wa.hello": "Olá {name}, aqui é {shop}.",
@@ -599,6 +621,8 @@ function emptyDb() {
       lang: "es",
       seeded: false,
       welcome: true,
+      lastBackupAt: "",
+      bakSnooze: "",
     },
     staff: [{ id: "s1", name: "Operario 1", active: true }],
     services: defaultServices(),
@@ -642,6 +666,100 @@ function load() {
 
 function save() {
   localStorage.setItem(KEY, JSON.stringify(db));
+}
+
+function daysSinceBackup() {
+  const at = db.settings.lastBackupAt;
+  if (!at) return Infinity;
+  const t0 = new Date(at).getTime();
+  if (Number.isNaN(t0)) return Infinity;
+  return Math.floor((Date.now() - t0) / 86400000);
+}
+
+function fmtBackupWhen() {
+  const days = daysSinceBackup();
+  if (!Number.isFinite(days)) return t("bak.never");
+  const when = days <= 0 ? t("bak.today") : t("bak.days", { n: days });
+  return t("bak.last", { when });
+}
+
+function backupStale() {
+  if (db.settings.welcome) return false;
+  if (!db.jobs.length && !db.clients.length) return false;
+  if (db.settings.bakSnooze === today()) return false;
+  return daysSinceBackup() >= 1;
+}
+
+function backupCard() {
+  if (!backupStale()) return "";
+  return `
+    <div class="card backup-card">
+      <h2>${t("bak.h")}</h2>
+      <p>${t("bak.warn")}</p>
+      <p class="muted">${esc(fmtBackupWhen())}</p>
+      <div class="actions">
+        <button class="btn wide" data-act="backup">${t("bak.do")}</button>
+        <button class="btn ghost" data-act="backup-later">${t("bak.later")}</button>
+      </div>
+    </div>`;
+}
+
+function backupSheet() {
+  return `
+    <div class="sheet">
+      <h2>${t("bak.h")}</h2>
+      <p>${t("bak.p")}</p>
+      <p class="muted">${esc(fmtBackupWhen())}</p>
+      <div class="actions">
+        <button class="btn wide" data-act="backup-share">${t("bak.share")}</button>
+        <button class="btn ghost wide" data-act="export">${t("bak.out")}</button>
+        <button class="btn ghost wide" data-act="import">${t("bak.in")}</button>
+        <button class="btn ghost wide" data-act="close">${t("form.close")}</button>
+      </div>
+    </div>`;
+}
+
+function backupBlob() {
+  return new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+}
+
+function backupFileName() {
+  return `control-lavados-${today()}.json`;
+}
+
+function markBackupDone() {
+  db.settings.lastBackupAt = new Date().toISOString();
+  db.settings.bakSnooze = "";
+  save();
+}
+
+function backupDownload() {
+  markBackupDone();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(backupBlob());
+  a.download = backupFileName();
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  closeModal();
+  render();
+}
+
+async function backupShare() {
+  const blob = backupBlob();
+  const name = backupFileName();
+  try {
+    const file = new File([blob], name, { type: "application/json" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: t("bak.h"), text: t("bak.shareText") });
+      markBackupDone();
+      closeModal();
+      render();
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+  }
+  backupDownload();
 }
 
 function clientById(id) {
@@ -1151,6 +1269,7 @@ function pageHoje() {
     .reduce((a, j) => a + jobTotal(j), 0);
   return `
     ${installCard()}
+    ${backupCard()}
     <div class="grid">
       <div class="stat"><b>${list.length}</b><span>${t("hoje.washes")}</span></div>
       <div class="stat"><b>${fmtMoney(money)}</b><span>${t("hoje.paid")}</span></div>
@@ -1518,7 +1637,7 @@ function pageMais() {
     <div class="list">
       ${installRow}
       <button class="item" data-act="go" data-hash="caixa"><div class="grow"><strong>${t("more.cash")}</strong><small>${t("more.cash2")}</small></div></button>
-      <button class="item" data-act="backup"><div class="grow"><strong>${t("more.bak")}</strong><small>${t("more.bak2")}</small></div></button>
+      <button class="item" data-act="backup"><div class="grow"><strong>${t("more.bak")}</strong><small>${esc(fmtBackupWhen())} · ${t("more.bak2")}</small></div></button>
       <button class="item" data-act="go" data-hash="precos"><div class="grow"><strong>${t("more.price")}</strong><small>${t("more.price2")}</small></div></button>
       <button class="item" data-act="go" data-hash="equipa"><div class="grow"><strong>${t("more.team")}</strong><small>${t("more.team2")}</small></div></button>
       <button class="item" data-act="go" data-hash="oficina"><div class="grow"><strong>${t("more.shop")}</strong><small>${t("more.shop2")}</small></div></button>
@@ -1960,11 +2079,7 @@ function render() {
 }
 
 function backupExport() {
-  const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `controle-lavagens-${today()}.json`;
-  a.click();
+  backupDownload();
 }
 
 function backupImport() {
@@ -1974,14 +2089,17 @@ function backupImport() {
   input.onchange = async () => {
     const file = input.files?.[0];
     if (!file) return;
+    if (!confirm(t("bak.confirm"))) return;
     try {
       const data = JSON.parse(await file.text());
-      if (!data || !Array.isArray(data.clients)) throw new Error("ficheiro inválido");
+      if (!data || !Array.isArray(data.clients)) throw new Error("archivo no válido");
       db = { ...emptyDb(), ...data, settings: { ...emptyDb().settings, ...(data.settings || {}), welcome: false } };
+      db.settings.lastBackupAt = new Date().toISOString();
       save();
+      closeModal();
       render();
     } catch (err) {
-      alert("Não deu para restaurar: " + err.message);
+      alert(t("alert.bak") + err.message);
     }
   };
   input.click();
@@ -2178,16 +2296,13 @@ document.addEventListener("click", (event) => {
     render();
   }
   if (act === "backup") {
-    openModal(`
-      <div class="sheet">
-        <h2>Cópia de segurança</h2>
-        <p class="muted">Guarde o ficheiro no telemóvel ou envie a si mesmo por WhatsApp.</p>
-        <div class="actions">
-          <button class="btn wide" data-act="export">Exportar</button>
-          <button class="btn ghost wide" data-act="import">Restaurar</button>
-          <button class="btn ghost wide" data-act="close">Fechar</button>
-        </div>
-      </div>`);
+    openModal(backupSheet());
+  }
+  if (act === "backup-share") backupShare();
+  if (act === "backup-later") {
+    db.settings.bakSnooze = today();
+    save();
+    render();
   }
   if (act === "export") backupExport();
   if (act === "import") backupImport();
