@@ -198,11 +198,21 @@ label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px;
 
 .check {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: flex-start;
   padding: 8px 0;
   border-bottom: 1px solid var(--line);
 }
+.check input[type="checkbox"] {
+  width: auto;
+  min-width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  margin: 3px 0 0;
+  border: 0;
+  box-shadow: none;
+}
+.check .grow { flex: 1; min-width: 0; }
 .total {
   font-size: 28px;
   font-weight: 800;
